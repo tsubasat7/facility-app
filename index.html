@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>支援アプリ｜施設用</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+    main {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #3498db;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 8px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>支援アプリ（施設運用版）</h1>
+</header>
+
+<main>
+
+  <!-- ① 記録画面 -->
+  <div class="card">
+    <h2>① 今日の記録</h2>
+    <label>気分（0〜10）</label>
+    <input type="number" id="mood" min="0" max="10">
+    
+    <label>体調（0〜10）</label>
+    <input type="number" id="condition" min="0" max="10">
+
+    <label>今日のできごと</label>
+    <textarea id="memo"></textarea>
+
+    <button onclick="analyze()">記録して判定</button>
+  </div>
+
+  <!-- ② 状態表示 -->
+  <div class="card hidden" id="resultCard">
+    <h2>② 今日の状態</h2>
+    <p id="stateText"></p>
+  </div>
+
+  <!-- ③ アドバイス -->
+  <div class="card hidden" id="adviceCard">
+    <h2>③ 今日のアドバイス</h2>
+    <p id="adviceText"></p>
+  </div>
+
+  <!-- ④ スタッフ用 -->
+  <div class="card">
+    <h2>④ スタッフ確認用</h2>
+    <p>※ 現在は個別端末表示のみ。本格連携は次段階。</p>
+  </div>
+
+</main>
+
+<script>
+function analyze() {
+  const mood = Number(document.getElementById("mood").value);
+  const condition = Number(document.getElementById("condition").value);
+
+  let state = "安定";
+  let advice = "今日は現在のペースを大切にしましょう。";
+
+  if (mood <= 3 || condition <= 3) {
+    state = "注意";
+    advice = "無理をせず、休息を最優先にしてください。";
+  }
+
+  if (mood <= 1 || condition <= 1) {
+    state = "要相談";
+    advice = "不調が強いため、スタッフへ相談してください。";
+  }
+
+  document.getElementById("stateText").innerText = "判定結果：" + state;
+  document.getElementById("adviceText").innerText = advice;
+
+  document.getElementById("resultCard").classList.remove("hidden");
+  document.getElementById("adviceCard").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
