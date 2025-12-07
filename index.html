@@ -1,122 +1,235 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>支援アプリ｜施設用</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>支援判定アプリ（施設内専用）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #f4f6f8;
       margin: 0;
       padding: 0;
     }
     header {
-      background: #2c3e50;
+      background: #1f2937;
       color: white;
       padding: 16px;
       text-align: center;
+      font-size: 18px;
     }
     main {
-      padding: 20px;
       max-width: 900px;
-      margin: auto;
+      margin: 0 auto;
+      padding: 20px;
     }
     .card {
       background: white;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #3498db;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
     }
-    textarea, input {
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input[type="number"], input[type="text"] {
       width: 100%;
       padding: 10px;
+      margin-top: 6px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      margin-top: 8px;
+      font-size: 16px;
     }
-    .hidden {
-      display: none;
+    button {
+      margin-top: 20px;
+      padding: 14px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+    .result {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    .clarify {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .doubt {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .alert {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .hold {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #555;
+      padding: 16px;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background: #f3f4f6;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>支援アプリ（施設運用版）</h1>
+  施設内支援用 判定アプリ（診断目的ではありません）
 </header>
 
 <main>
-
-  <!-- ① 記録画面 -->
+  <!-- 入力カード -->
   <div class="card">
-    <h2>① 今日の記録</h2>
+    <h2>状態入力</h2>
+
+    <label>利用者名（任意）</label>
+    <input type="text" id="name" placeholder="例：Aさん" />
+
     <label>気分（0〜10）</label>
-    <input type="number" id="mood" min="0" max="10">
-    
+    <input type="number" id="mood" min="0" max="10" />
+
     <label>体調（0〜10）</label>
-    <input type="number" id="condition" min="0" max="10">
+    <input type="number" id="physical" min="0" max="10" />
 
-    <label>今日のできごと</label>
-    <textarea id="memo"></textarea>
+    <label>出来事の強さ（0〜10）</label>
+    <input type="number" id="event" min="0" max="10" />
 
-    <button onclick="analyze()">記録して判定</button>
+    <label>短期変動（short-window：0〜10）</label>
+    <input type="number" id="short" min="0" max="10" />
+
+    <button onclick="judge()">判定する</button>
+
+    <div id="resultArea"></div>
   </div>
 
-  <!-- ② 状態表示 -->
-  <div class="card hidden" id="resultCard">
-    <h2>② 今日の状態</h2>
-    <p id="stateText"></p>
-  </div>
-
-  <!-- ③ アドバイス -->
-  <div class="card hidden" id="adviceCard">
-    <h2>③ 今日のアドバイス</h2>
-    <p id="adviceText"></p>
-  </div>
-
-  <!-- ④ スタッフ用 -->
+  <!-- 履歴 -->
   <div class="card">
-    <h2>④ スタッフ確認用</h2>
-    <p>※ 現在は個別端末表示のみ。本格連携は次段階。</p>
+    <h2>本日の簡易履歴（ブラウザ内）</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>時刻</th>
+          <th>名前</th>
+          <th>結果</th>
+        </tr>
+      </thead>
+      <tbody id="history"></tbody>
+    </table>
   </div>
-
 </main>
 
+<footer>
+  ※このアプリは診断・医療判断・薬剤判断には使用できません。<br />
+  ※支援判断の補助ツールです。
+</footer>
+
 <script>
-function analyze() {
-  const mood = Number(document.getElementById("mood").value);
-  const condition = Number(document.getElementById("condition").value);
+  function judge() {
+    const name = document.getElementById("name").value || "未入力";
+    const mood = Number(document.getElementById("mood").value);
+    const physical = Number(document.getElementById("physical").value);
+    const event = Number(document.getElementById("event").value);
+    const short = Number(document.getElementById("short").value);
 
-  let state = "安定";
-  let advice = "今日は現在のペースを大切にしましょう。";
+    const resultArea = document.getElementById("resultArea");
 
-  if (mood <= 3 || condition <= 3) {
-    state = "注意";
-    advice = "無理をせず、休息を最優先にしてください。";
+    if (
+      isNaN(mood) || isNaN(physical) || isNaN(event) || isNaN(short)
+    ) {
+      alert("すべて数値で入力してください");
+      return;
+    }
+
+    // ✅ 誤検知防止：短期変動が大きい場合は保留
+    if (short >= 7) {
+      resultArea.innerHTML = `
+        <div class="result hold">
+          判定：保留<br />
+          短期変動が大きいため30〜60分後に再評価してください
+        </div>
+      `;
+      addHistory(name, "保留");
+      return;
+    }
+
+    // ✅ 基本スコア計算
+    const score = mood + physical - event;
+
+    let result = "";
+    let className = "";
+
+    // ✅ 境界±0.2を考慮した安定帯
+    if (score >= 11) {
+      result = "安全（clarify）";
+      className = "clarify";
+    } else if (score >= 7) {
+      result = "注意（doubt）";
+      className = "doubt";
+    } else {
+      result = "要相談（alert）";
+      className = "alert";
+    }
+
+    resultArea.innerHTML = `
+      <div class="result ${className}">
+        判定結果：${result}
+      </div>
+    `;
+
+    addHistory(name, result);
   }
 
-  if (mood <= 1 || condition <= 1) {
-    state = "要相談";
-    advice = "不調が強いため、スタッフへ相談してください。";
+  function addHistory(name, result) {
+    const history = document.getElementById("history");
+    const tr = document.createElement("tr");
+
+    const now = new Date();
+    const time =
+      now.getHours().toString().padStart(2, "0") +
+      ":" +
+      now.getMinutes().toString().padStart(2, "0");
+
+    tr.innerHTML = `
+      <td>${time}</td>
+      <td>${name}</td>
+      <td>${result}</td>
+    `;
+
+    history.prepend(tr);
   }
-
-  document.getElementById("stateText").innerText = "判定結果：" + state;
-  document.getElementById("adviceText").innerText = advice;
-
-  document.getElementById("resultCard").classList.remove("hidden");
-  document.getElementById("adviceCard").classList.remove("hidden");
-}
 </script>
 
 </body>
