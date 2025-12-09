@@ -1,236 +1,266 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>支援判定アプリ（施設内専用）</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SupportLog — 施設向け 心理支援アプリ（Adlerベース）</title>
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #1f2937;
-      color: white;
-      padding: 16px;
-      text-align: center;
-      font-size: 18px;
-    }
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 18px;
-    }
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-    input[type="number"], input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 14px;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background: #2563eb;
-      color: white;
-    }
-    .result {
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
-    .clarify {
-      background: #d1fae5;
-      color: #065f46;
-    }
-    .doubt {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .alert {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    .hold {
-      background: #e5e7eb;
-      color: #374151;
-    }
-    footer {
-      text-align: center;
-      font-size: 12px;
-      color: #555;
-      padding: 16px;
-    }
-    table {
-      width: 100%;
-      margin-top: 20px;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-      font-size: 14px;
-    }
-    th {
-      background: #f3f4f6;
-    }
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#60a5fa;--muted:#94a3b8;--good:#059669;--warn:#f97316;--danger:#ef4444;}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial; background:linear-gradient(180deg,#071027 0%, #071827 60%);color:#e6eef8}
+    .wrap{max-width:1100px;margin:24px auto;padding:18px}
+    header{display:flex;align-items:center;gap:18px}
+    h1{margin:0;font-size:20px}
+    .roles{margin-left:auto;display:flex;gap:8px}
+    .role-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+    .role-btn.active{border-color:rgba(96,165,250,0.9);color:var(--accent)}
+    main{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    .row{display:flex;gap:8px}
+    input[type='range']{width:100%}
+    textarea{width:100%;min-height:96px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);padding:10px;background:transparent;color:inherit}
+    .small{font-size:12px;color:var(--muted)}
+    .btn{background:var(--accent);color:#06203b;border:none;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .log-list{max-height:420px;overflow:auto;margin-top:10px}
+    .log-item{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);margin-bottom:8px}
+    .tag{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.02);display:inline-block;margin-right:8px}
+    .suggest{background:linear-gradient(90deg,#04202a, #062434);padding:10px;border-radius:8px;margin-top:8px}
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+    .flex-col{display:flex;flex-direction:column;gap:8px}
+    .priority{display:flex;gap:8px;flex-wrap:wrap}
+    .danger{color:var(--danger)}
+    .warn{color:var(--warn)}
+    .good{color:var(--good)}
+    .divider{height:1px;background:rgba(255,255,255,0.02);margin:10px 0}
+    .role-note{font-size:13px;color:var(--muted);margin-top:6px}
   </style>
 </head>
 <body>
-
-<header>
-  施設内支援用 判定アプリ（診断目的ではありません）
-</header>
-
-<main>
-  <!-- 入力カード -->
-  <div class="card">
-    <h2>状態入力</h2>
-
-    <label>利用者名（任意）</label>
-    <input type="text" id="name" placeholder="例：Aさん" />
-
-    <label>気分（0〜10）</label>
-    <input type="number" id="mood" min="0" max="10" />
-
-    <label>体調（0〜10）</label>
-    <input type="number" id="physical" min="0" max="10" />
-
-    <label>出来事の強さ（0〜10）</label>
-    <input type="number" id="event" min="0" max="10" />
-
-    <label>短期変動（short-window：0〜10）</label>
-    <input type="number" id="short" min="0" max="10" />
-
-    <button onclick="judge()">判定する</button>
-
-    <div id="resultArea"></div>
-  </div>
-
-  <!-- 履歴 -->
-  <div class="card">
-    <h2>本日の簡易履歴（ブラウザ内）</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>時刻</th>
-          <th>名前</th>
-          <th>結果</th>
-        </tr>
-      </thead>
-      <tbody id="history"></tbody>
-    </table>
-  </div>
-</main>
-
-<footer>
-  ※このアプリは診断・医療判断・薬剤判断には使用できません。<br />
-  ※支援判断の補助ツールです。
-</footer>
-
-<script>
-  function judge() {
-    const name = document.getElementById("name").value || "未入力";
-    const mood = Number(document.getElementById("mood").value);
-    const physical = Number(document.getElementById("physical").value);
-    const event = Number(document.getElementById("event").value);
-    const short = Number(document.getElementById("short").value);
-
-    const resultArea = document.getElementById("resultArea");
-
-    if (
-      isNaN(mood) || isNaN(physical) || isNaN(event) || isNaN(short)
-    ) {
-      alert("すべて数値で入力してください");
-      return;
-    }
-
-    // ✅ 誤検知防止：短期変動が大きい場合は保留
-    if (short >= 7) {
-      resultArea.innerHTML = `
-        <div class="result hold">
-          判定：保留<br />
-          短期変動が大きいため30〜60分後に再評価してください
-        </div>
-      `;
-      addHistory(name, "保留");
-      return;
-    }
-
-    // ✅ 基本スコア計算
-    const score = mood + physical - event;
-
-    let result = "";
-    let className = "";
-
-    // ✅ 境界±0.2を考慮した安定帯
-    if (score >= 11) {
-      result = "安全（clarify）";
-      className = "clarify";
-    } else if (score >= 7) {
-      result = "注意（doubt）";
-      className = "doubt";
-    } else {
-      result = "要相談（alert）";
-      className = "alert";
-    }
-
-    resultArea.innerHTML = `
-      <div class="result ${className}">
-        判定結果：${result}
+  <div class="wrap">
+    <header>
+      <h1>SupportLog — 施設向け 心理支援アプリ（Adler-informed）</h1>
+      <div class="roles" aria-hidden>
+        <button id="role-self" class="role-btn">本人入力</button>
+        <button id="role-staff" class="role-btn active">スタッフ入力</button>
+        <button id="role-family" class="role-btn">家族入力</button>
       </div>
-    `;
+    </header>
 
-    addHistory(name, result);
-  }
+    <main>
+      <section class="card">
+        <div class="flex-col">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <label>対象（ID / 名前）</label>
+              <input id="target" placeholder="例: 山田太郎" style="width:260px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit" />
+            </div>
+            <div>
+              <label>日時</label>
+              <div id="now" class="small"></div>
+            </div>
+          </div>
 
-  function addHistory(name, result) {
-    const history = document.getElementById("history");
-    const tr = document.createElement("tr");
+          <div class="divider"></div>
 
-    const now = new Date();
-    const time =
-      now.getHours().toString().padStart(2, "0") +
-      ":" +
-      now.getMinutes().toString().padStart(2, "0");
+          <label>感情（0:非常に低い → 10:非常に高い）</label>
+          <input id="mood" type="range" min="0" max="10" value="5" />
+          <div class="row"><div class="small">現在の値: <span id="mood-val">5</span></div><div style="margin-left:auto" class="small">過去平均: <span id="mood-avg">--</span></div></div>
 
-    tr.innerHTML = `
-      <td>${time}</td>
-      <td>${name}</td>
-      <td>${result}</td>
-    `;
+          <label style="margin-top:8px">エネルギー / 活動性（0-10）</label>
+          <input id="energy" type="range" min="0" max="10" value="5" />
 
-    history.prepend(tr);
-  }
-</script>
+          <label style="margin-top:8px">主観メモ（出来事・観察・発言など）</label>
+          <textarea id="note" placeholder="例: 朝食を拒否。午前中に落ち着かず、窓を叩く発言あり。"></textarea>
 
+          <label style="margin-top:8px">タグ（カンマ区切り）</label>
+          <input id="tags" placeholder="例: 過集中,睡眠不足" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit" />
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="save" class="btn">記録して判定</button>
+            <button id="quick-family" class="btn ghost">家族へテンプレ送信</button>
+            <button id="export" class="role-btn">CSVエクスポート</button>
+          </div>
+
+          <div class="role-note" id="role-note">操作はスタッフモードです。入力者を切り替えて運用してください。</div>
+
+          <div class="divider"></div>
+
+          <div>
+            <label>自動判定（簡易）</label>
+            <div id="diagnosis" class="suggest small">まだ記録がありません。</div>
+            <div id="adler-suggestion" class="suggest small" style="margin-top:6px">アドラー心理学に基づく支援メモはここに表示されます。</div>
+          </div>
+
+        </div>
+      </section>
+
+      <aside class="card">
+        <div>
+          <h3 style="margin:0">ログ</h3>
+          <div class="small">過去の記録（ローカル保存）</div>
+          <div class="log-list" id="log-list" aria-live="polite"></div>
+
+          <div class="divider"></div>
+          <label>即時対応テンプレ（スタッフ）</label>
+          <div class="priority" id="staff-templates">
+            <div class="tag">穏やかに接する</div>
+            <div class="tag">短い肯定（例: よく知らせてくれてありがとう）</div>
+            <div class="tag">行動の分離（例: 「行為は問題、人は無関係」）</div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>家族送信用テンプレ</label>
+            <div class="small">家族向けには安心を優先した表現。診断や専門的表現は避けます。</div>
+            <div id="family-template" class="suggest small" style="margin-top:6px"></div>
+          </div>
+
+          <div class="divider"></div>
+          <label>注意サイン</label>
+          <div id="signs" class="small">ここに重大なサイン（自傷念慮、急性混乱など）が表示されます。</div>
+
+        </div>
+      </aside>
+    </main>
+
+    <footer class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong>運用ヒント</strong>
+          <div class="small">記録は日付と対象を明確に。重大事象は電話で直接連絡後、ここに記録してください。</div>
+        </div>
+        <div>
+          <button id="clear" class="role-btn">ローカルを消去</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // --- Simple facility-ready single-file app
+    const nowEl = document.getElementById('now');
+    const mood = document.getElementById('mood');
+    const moodVal = document.getElementById('mood-val');
+    const energy = document.getElementById('energy');
+    const note = document.getElementById('note');
+    const tags = document.getElementById('tags');
+    const save = document.getElementById('save');
+    const logList = document.getElementById('log-list');
+    const diagnosis = document.getElementById('diagnosis');
+    const adlerSuggestion = document.getElementById('adler-suggestion');
+    const familyTemplate = document.getElementById('family-template');
+    const roleNote = document.getElementById('role-note');
+    const roleSelf = document.getElementById('role-self');
+    const roleStaff = document.getElementById('role-staff');
+    const roleFamily = document.getElementById('role-family');
+    const target = document.getElementById('target');
+    const quickFamily = document.getElementById('quick-family');
+    const exportBtn = document.getElementById('export');
+    const clearBtn = document.getElementById('clear');
+
+    function nowStr(){ const d=new Date(); return d.toLocaleString(); }
+    nowEl.textContent = nowStr();
+    setInterval(()=>nowEl.textContent = nowStr(), 60000);
+
+    mood.addEventListener('input', ()=> moodVal.textContent = mood.value);
+
+    // role management
+    let role = 'staff';
+    function setRole(r){ role=r; [roleSelf,roleStaff,roleFamily].forEach(b=>b.classList.remove('active')); document.getElementById('role-'+r).classList.add('active'); roleNote.textContent = (r==='staff')? '操作はスタッフモードです。入力者を切り替えて運用してください。' : (r==='self')? '本人入力モード：質問は簡潔に。プライバシーに配慮して記録してください。' : '家族入力モード：観察と事実を中心に記録してください。'; }
+    [roleSelf,roleStaff,roleFamily].forEach(b=>b.addEventListener('click', ()=> setRole(b.id.replace('role-',''))));
+    setRole('staff');
+
+    // storage
+    const KEY = 'supportlog_records_v1';
+    function load(){ try{ return JSON.parse(localStorage.getItem(KEY) || '[]') } catch(e){return []} }
+    function saveAll(arr){ localStorage.setItem(KEY, JSON.stringify(arr)) }
+    function addRecord(rec){ const a=load(); a.unshift(rec); saveAll(a); renderLogs(); }
+
+    // render
+    function renderLogs(){ const a=load(); logList.innerHTML=''; a.slice(0,200).forEach(r=>{ const e=document.createElement('div'); e.className='log-item'; e.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between"><div><strong>${r.target||'──'}</strong> <span class="small">(${r.role})</span></div><div class="small">${r.time}</div></div><div class="small">Mood:${r.mood} Energy:${r.energy} Tags:${r.tags||''}</div><div style="margin-top:6px">${escapeHtml(r.note||'')}</div>`; logList.appendChild(e); }); updateAverages(); }
+
+    function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+    function updateAverages(){ const a=load(); if(!a.length){ document.getElementById('mood-avg').textContent='--'; return;} const avg = (a.reduce((s,x)=>s+Number(x.mood||0),0)/a.length).toFixed(1); document.getElementById('mood-avg').textContent = avg; }
+
+    renderLogs();
+
+    // simple anomaly & support logic
+    function simpleDiagnosis(rec){
+      // rules: low energy + low mood -> watch for withdrawal
+      const m = Number(rec.mood), e = Number(rec.energy);
+      let flags = [];
+      if(m<=2 && e<=3) flags.push('withdrawal');
+      if(m>=8 && e>=8) flags.push('overactivation');
+      if(rec.tags && rec.tags.includes('被害妄想')) flags.push('paranoid');
+      if(rec.tags && rec.tags.includes('自傷')) flags.push('selfharm');
+      if(rec.note && /自殺|死にたい|消えたい/.test(rec.note)) flags.push('suicidal_language');
+      return flags;
+    }
+
+    function adlerAdvice(rec,flags){
+      // produce short guidance lines based on Adler psychology and staff/family role
+      const adv = [];
+      // base: encourage courage, separate task and person
+      adv.push('短い勇気づけを使う: 「よく知らせてくれてありがとう。今のことを一緒に考えましょう。」');
+      adv.push('課題の分離: 行動は問題、本人は価値ある存在であることを示す短文を入れる。');
+      if(flags.includes('withdrawal')) adv.push('観察: 小さな共同作業（飲み物を一緒に用意等）で社会的繋がりを促進。');
+      if(flags.includes('overactivation')) adv.push('落ち着ける短い行動提案: 深呼吸3回→短い移動（椅子に座る）など');
+      if(flags.includes('paranoid')) adv.push('被害感がある場合は否定せず「それは不安ですね。今は安全です」と安心を優先');
+      if(flags.includes('selfharm')||flags.includes('suicidal_language')) adv.push('**安全対応必須**: 直ちに医療連携・上位者へ連絡。緊急なら救急対応。');
+      return adv;
+    }
+
+    function familyTemplateFor(rec,flags){
+      // neutral, non-alarming family message
+      const parts = [];
+      parts.push(`${rec.time} の記録: ${rec.target || '対象'} の様子を観察しました。`);
+      parts.push(`短く: 気分(${rec.mood}/10), 活動(${rec.energy}/10)。`);
+      if(rec.note) parts.push(`観察メモ: ${rec.note}`);
+      parts.push('対応方針: 当面は安定化を優先し、落ち着いた接し方を行っています。');
+      if(flags.includes('suicidal_language')||flags.includes('selfharm')) parts.push('緊急性があるため、医療対応を検討しています（施設内で相談済）。');
+      return parts.join('\n');
+    }
+
+    save.addEventListener('click', ()=>{
+      const rec = {
+        time: new Date().toLocaleString(),
+        role, target: target.value.trim(), mood: mood.value, energy: energy.value, note: note.value.trim(), tags: tags.value.trim(), meta: {ua: navigator.userAgent}
+      };
+      // detect flags
+      const flags = simpleDiagnosis(rec);
+      addRecord(rec);
+
+      // update UI diagnosis and suggestions
+      if(flags.length===0){ diagnosis.textContent = '判定: 通常レンジ（観察継続）。'; diagnosis.className='suggest small'; }
+      else if(flags.includes('suicidal_language')||flags.includes('selfharm')){ diagnosis.innerHTML = '<strong class="danger">緊急サイン検知 — 医療連携を実行してください</strong>'; }
+      else { diagnosis.textContent = '判定: 注意サインあり — 詳細を確認してください。'; }
+
+      const adv = adlerAdvice(rec, flags);
+      adlerSuggestion.innerHTML = adv.map(s=>'• '+s).join('<br>');
+
+      familyTemplate.textContent = familyTemplateFor(rec, flags);
+
+      alert('記録完了 — ローカルに保存され、判定と支援案を画面に表示しました。');
+    });
+
+    quickFamily.addEventListener('click', ()=>{ if(!familyTemplate.textContent) return alert('まず記録してください'); navigator.clipboard.writeText(familyTemplate.textContent).then(()=>alert('家族向けテンプレをクリップボードにコピーしました。')) });
+
+    exportBtn.addEventListener('click', ()=>{
+      const a = load(); if(!a.length) return alert('データがありません');
+      const csv = ['time,target,role,mood,energy,tags,note'].concat(a.map(r=>`${csvSafe(r.time)},${csvSafe(r.target)},${csvSafe(r.role)},${r.mood},${r.energy},${csvSafe(r.tags)},${csvSafe(r.note)}`)).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const ael = document.createElement('a'); ael.href=url; ael.download = 'supportlog_export.csv'; document.body.appendChild(ael); ael.click(); ael.remove(); URL.revokeObjectURL(url);
+    });
+
+    function csvSafe(s){ if(!s) return '""'; return '"'+(s.replace(/"/g,'""'))+'"'; }
+
+    clearBtn.addEventListener('click', ()=>{ if(confirm('ローカル保存された全データを削除しますか？')){ localStorage.removeItem(KEY); renderLogs(); } });
+
+    // initial demo content
+    if(!load().length){ addRecord({time: new Date().toLocaleString(), role:'system', target:'デモ: 佐藤', mood:6, energy:5, tags:'', note:'朝に少し落ち着きがない様子。', meta:{}}); }
+
+  </script>
 </body>
 </html>
