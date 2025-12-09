@@ -264,3 +264,35 @@
   </script>
 </body>
 </html>
+
+<!-- ▼▼ 感覚的UIレイヤー（数値の代替表示）追記 2025-12-09 ▼▼ -->
+<section id="sense-ui" style="margin-top:24px;padding:16px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08)">
+  <h2 style="font-size:20px;margin-bottom:8px">いまの状態（感覚表示）</h2>
+  <p id="sense-label" style="font-size:18px;margin:6px 0">🟢 安定</p>
+  <div style="height:16px;background:#eee;border-radius:999px;overflow:hidden">
+    <div id="sense-bar" style="height:100%;width:20%;background:linear-gradient(90deg,#6ee7b7,#34d399)"></div>
+  </div>
+  <p id="sense-message" style="margin-top:10px;font-size:14px">今日は無理せず、今できていることを続ける日です。</p>
+</section>
+
+<script>
+// 数値→感覚変換マッピング
+function toSenseView(score){
+  let label="🟢 安定";
+  let msg="今日は無理せず、今できていることを続ける日です。";
+  let width="20%";
+  if(score>=25 && score<50){label="🟡 やや注意";msg="少し疲れが出やすい状態。休憩を意識しましょう。";width="45%";}
+  if(score>=50 && score<75){label="🟠 要サポート";msg="無理が重なりやすい時期。誰かに頼ってOKです。";width="70%";}
+  if(score>=75){label="🔴 緊急";msg="今は一人で抱えず、すぐ周囲と相談しましょう。";width="95%";}
+  document.getElementById("sense-label").innerText=label;
+  document.getElementById("sense-message").innerText=msg;
+  document.getElementById("sense-bar").style.width=width;
+}
+
+// 既存の数値結果がある前提で自動反映（score変数があれば吸収）
+try{
+  if(typeof score !== 'undefined') toSenseView(score);
+}catch(e){console.log("sense-ui standby");}
+</script>
+<!-- ▲▲ 感覚的UIレイヤー 追記ここまで ▲▲ -->
+
