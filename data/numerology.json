@@ -1,0 +1,614 @@
+{
+  "1": {
+    "number": 1,
+    "grade": "gold",
+    "constellation": "導星座",
+    "keyword": "スタート・原点",
+    "personality": "先頭に立ち、新しく物事を始める力がある。直感と行動力に優れる。",
+    "behavior": "単独行動を好み、スピード重視で進める。",
+    "destiny": "人生の重要な始まりを担う役割を持つ。",
+    "story_hook": ["child_lead", "solo_start"]
+  },
+  "2": {
+    "number": 2,
+    "grade": "gold",
+    "constellation": "導星座",
+    "keyword": "協調・調整",
+    "personality": "人の気持ちを読む力に優れ、調整役となる。",
+    "behavior": "周囲を見ながら慎重に動く。",
+    "destiny": "人間関係のバランスを整える使命を持つ。",
+    "story_hook": ["family_adjust", "quiet_support"]
+  },
+  "3": {
+    "number": 3,
+    "grade": "gold",
+    "constellation": "導星座",
+    "keyword": "楽しさ・創造",
+    "personality": "明るく、発想が豊か。周囲を楽しませる。",
+    "behavior": "好奇心で動き、変化を恐れない。",
+    "destiny": "多彩な才能を形にする流れを持つ。",
+    "story_hook": ["creative_child", "many_interests"]
+  },
+  "4": {
+    "number": 4,
+    "grade": "gold",
+    "constellation": "導星座",
+    "keyword": "安定・基盤",
+    "personality": "現実的で誠実。基盤づくりを大切にする。",
+    "behavior": "堅実に進め、計画を重視する。",
+    "destiny": "人生の土台を築く役割を担う。",
+    "story_hook": ["responsible_youth", "patient_growth"]
+  },
+  "5": {
+    "number": 5,
+    "grade": "gold",
+    "constellation": "導星座",
+    "keyword": "自由・変化",
+    "personality": "変化に強く、新しい環境にすぐ順応する。",
+    "behavior": "直感で行動し、枠にはまらない。",
+    "destiny": "環境や状況を大きく変えていく流れを持つ。",
+    "story_hook": ["freedom_conflict", "early_move"]
+  },
+
+  "6": {
+    "number": 6,
+    "grade": "silver",
+    "constellation": "導星座",
+    "keyword": "保護・家庭",
+    "personality": "面倒見がよく、家族を守るタイプ。",
+    "behavior": "仲間や家族優先で動く。",
+    "destiny": "人を育て、守る役割が強い。",
+    "story_hook": ["family_care", "big_sibling"]
+  },
+  "7": {
+    "number": 7,
+    "grade": "silver",
+    "constellation": "導星座",
+    "keyword": "探求・本質",
+    "personality": "本質を見抜き、深い理解を持つ。",
+    "behavior": "一人での探求を好む。",
+    "destiny": "物事の裏側を見抜く使命を持つ。",
+    "story_hook": ["lonely_child", "deep_thinker"]
+  },
+  "8": {
+    "number": 8,
+    "grade": "silver",
+    "constellation": "導星座",
+    "keyword": "成果・権威",
+    "personality": "成功思考が強く、目標に向けて努力する。",
+    "behavior": "継続力と責任感が強い。",
+    "destiny": "大きな達成と社会的評価を得る流れ。",
+    "story_hook": ["high_expectations", "responsibility_tests"]
+  },
+  "9": {
+    "number": 9,
+    "grade": "silver",
+    "constellation": "導星座",
+    "keyword": "完成・精神性",
+    "personality": "精神性が高く、優しさと理解力を持つ。",
+    "behavior": "人の痛みに共感し動く。",
+    "destiny": "慈愛と奉仕のテーマを生きる。",
+    "story_hook": ["sensitive_child", "empathy_burden"]
+  },
+  "10": {
+    "number": 10,
+    "grade": "silver",
+    "constellation": "導星座",
+    "keyword": "切替・リスタート",
+    "personality": "過去を手放し、新たなスタートを切る力が強い。",
+    "behavior": "判断が早く執着しない。",
+    "destiny": "何度でも再スタートできる人生を歩む。",
+    "story_hook": ["reset_events", "fresh_start"]
+  },
+
+  "11": {
+    "number": 11,
+    "grade": "gold",
+    "constellation": "精霊座",
+    "keyword": "感受性・ひらめき",
+    "personality": "繊細で直感が鋭い芸術肌。",
+    "behavior": "気分で動く面があり波がある。",
+    "destiny": "感性を活かして人に影響を与える。",
+    "story_hook": ["artistic_child", "high_sensitivity"]
+  },
+  "12": {
+    "number": 12,
+    "grade": "gold",
+    "constellation": "精霊座",
+    "keyword": "奉仕・献身",
+    "personality": "他者のために尽くす優しい性質。",
+    "behavior": "人に合わせて行動しがち。",
+    "destiny": "人に与えることで成長する流れ。",
+    "story_hook": ["self_sacrifice", "family_service"]
+  },
+  "13": {
+    "number": 13,
+    "grade": "gold",
+    "constellation": "精霊座",
+    "keyword": "改革・構造変化",
+    "personality": "既存の枠を壊して新しい形を作る革新タイプ。",
+    "behavior": "本質的な問題を見抜き、改善へ動く。",
+    "destiny": "変革者としての役割が強い。",
+    "story_hook": ["rebel_youth", "structure_break"]
+  },
+  "14": {
+    "number": 14,
+    "grade": "gold",
+    "constellation": "精霊座",
+    "keyword": "適応・流動",
+    "personality": "状況に合わせて柔軟に動く能力が高い。",
+    "behavior": "マルチタスク型で変化に強い。",
+    "destiny": "流れに乗りながら人生が展開する。",
+    "story_hook": ["frequent_changes", "multi_talent"]
+  },
+  "15": {
+    "number": 15,
+    "grade": "gold",
+    "constellation": "精霊座",
+    "keyword": "魅力・統合",
+    "personality": "人を惹きつける魅力と包容力がある。",
+    "behavior": "自然と周囲をまとめる。",
+    "destiny": "多くの人を巻き込み影響する人生。",
+    "story_hook": ["popular_child", "center_role"]
+  },
+
+  "16": {
+    "number": 16,
+    "grade": "silver",
+    "constellation": "精霊座",
+    "keyword": "内省・整理",
+    "personality": "自分の感情や内面に深く向き合うタイプ。",
+    "behavior": "一度立ち止まり考える慎重性。",
+    "destiny": "内面の整理が人生のテーマ。",
+    "story_hook": ["solitude_phase", "inner_cleanup"]
+  },
+  "17": {
+    "number": 17,
+    "grade": "silver",
+    "constellation": "精霊座",
+    "keyword": "自己確立・自尊",
+    "personality": "自信と誇りを大切にする。芯が強い。",
+    "behavior": "自分の信念に従って行動する。",
+    "destiny": "自己価値を確立し広げる人生。",
+    "story_hook": ["confidence_test", "identity_seek"]
+  },
+  "18": {
+    "number": 18,
+    "grade": "silver",
+    "constellation": "精霊座",
+    "keyword": "分離・統合",
+    "personality": "人と距離を取ったり急に近づいたり波がある。",
+    "behavior": "気分の上下が強め。",
+    "destiny": "対人関係の学びが大きい。",
+    "story_hook": ["relationship_break", "reconnect"]
+  },
+  "19": {
+    "number": 19,
+    "grade": "silver",
+    "constellation": "精霊座",
+    "keyword": "光・自己表現",
+    "personality": "目立つ役割やステージに立つことが多い。",
+    "behavior": "人前に出ることを恐れない。",
+    "destiny": "表現者の道が開かれる。",
+    "story_hook": ["public_child", "stage_events"]
+  },
+  "20": {
+    "number": 20,
+    "grade": "silver",
+    "constellation": "精霊座",
+    "keyword": "調和・静寂",
+    "personality": "争いを避け、静かな環境を好む。",
+    "behavior": "慎重で、相手を優先して動く。",
+    "destiny": "静かに安定した流れを持つ。",
+    "story_hook": ["quiet_home", "peace_seek"]
+  },
+
+  "21": {
+    "number": 21,
+    "grade": "gold",
+    "constellation": "天命座",
+    "keyword": "頂点・完成",
+    "personality": "リーダー性とまとめる力を持つ。",
+    "behavior": "最終的に責任を引き受ける立場になる。",
+    "destiny": "大きな役割や成功を担う。",
+    "story_hook": ["team_leader", "big_goal"]
+  },
+  "22": {
+    "number": 22,
+    "grade": "gold",
+    "constellation": "天命座",
+    "keyword": "創造・具現化",
+    "personality": "大きなビジョンを現実化できる。",
+    "behavior": "地道な努力を続けるタイプ。",
+    "destiny": "大規模な創造を行う使命。",
+    "story_hook": ["big_project", "slow_build"]
+  },
+  "23": {
+    "number": 23,
+    "grade": "gold",
+    "constellation": "天命座",
+    "keyword": "展開・交流",
+    "personality": "人脈が広がりやすく、動きが活発。",
+    "behavior": "社交的で明るい。",
+    "destiny": "多くの人と関わり人生が展開する。",
+    "story_hook": ["many_friends", "busy_period"]
+  },
+  "24": {
+    "number": 24,
+    "grade": "gold",
+    "constellation": "天命座",
+    "keyword": "愛・守護",
+    "personality": "人から愛され、守られやすい。",
+    "behavior": "周囲の調和を大切にする。",
+    "destiny": "愛や支援に恵まれる人生。",
+    "story_hook": ["family_protection", "lucky_escape"]
+  },
+  "25": {
+    "number": 25,
+    "grade": "gold",
+    "constellation": "天命座",
+    "keyword": "知恵・学習",
+    "personality": "学習能力が高く、多くを吸収する。",
+    "behavior": "分析しながら慎重に動く。",
+    "destiny": "知を伝える役割。",
+    "story_hook": ["teacher_role", "study_focus"]
+  },
+
+  "26": {
+    "number": 26,
+    "grade": "silver",
+    "constellation": "天命座",
+    "keyword": "葛藤・試練",
+    "personality": "困難を乗り越える強さを持つ。",
+    "behavior": "粘り強いが内面の葛藤が多い。",
+    "destiny": "試練を超えて成功する人生。",
+    "story_hook": ["family_conflict", "overcome"]
+  },
+  "27": {
+    "number": 27,
+    "grade": "silver",
+    "constellation": "天命座",
+    "keyword": "極端・情熱",
+    "personality": "情熱的で極端に走りがち。",
+    "behavior": "波が激しく、集中力も強い。",
+    "destiny": "情熱的な人生展開。",
+    "story_hook": ["obsession_phase", "rapid_change"]
+  },
+  "28": {
+    "number": 28,
+    "grade": "silver",
+    "constellation": "天命座",
+    "keyword": "双極・流転",
+    "personality": "良い時と悪い時の差が激しい。",
+    "behavior": "決断を急ぎすぎることも。",
+    "destiny": "浮き沈みと再生がテーマ。",
+    "story_hook": ["loss_event", "regain"]
+  },
+  "29": {
+    "number": 29,
+    "grade": "silver",
+    "constellation": "天命座",
+    "keyword": "直感・導き",
+    "personality": "強い直感力で道を選ぶ。",
+    "behavior": "直感に従い大胆に動く。",
+    "destiny": "導かれるように人生が進む。",
+    "story_hook": ["intuitive_choice", "unexpected_turn"]
+  },
+  "30": {
+    "number": 30,
+    "grade": "silver",
+    "constellation": "天命座",
+    "keyword": "表現・創作",
+    "personality": "表現者気質が強く、創作に向く。",
+    "behavior": "感情豊かで人を惹きつける。",
+    "destiny": "表現活動で成功する流れ。",
+    "story_hook": ["art_role", "speech_event"]
+  },
+
+  "31": {
+    "number": 31,
+    "grade": "gold",
+    "constellation": "時空座",
+    "keyword": "安定・継続",
+    "personality": "地道に積み上げる力が高い。",
+    "behavior": "慎重で堅実。",
+    "destiny": "安定した流れで成果を出す。",
+    "story_hook": ["slow_growth", "stable_family"]
+  },
+  "32": {
+    "number": 32,
+    "grade": "gold",
+    "constellation": "時空座",
+    "keyword": "幸運・機会",
+    "personality": "運の強さが特徴。チャンスに恵まれる。",
+    "behavior": "積極的に動けば運気が伸びる。",
+    "destiny": "幸運により人生が開ける。",
+    "story_hook": ["lucky_events", "chance_meet"]
+  },
+  "33": {
+    "number": 33,
+    "grade": "gold",
+    "constellation": "時空座",
+    "keyword": "守護・安らぎ",
+    "personality": "周囲を安心させる存在。",
+    "behavior": "雰囲気が柔らかく誰とでも合う。",
+    "destiny": "人を守る役割が強い。",
+    "story_hook": ["healer_child", "calm_center"]
+  },
+  "34": {
+    "number": 34,
+    "grade": "gold",
+    "constellation": "時空座",
+    "keyword": "挑戦・突破",
+    "personality": "限界突破型。壁を壊して進む。",
+    "behavior": "常識を越えて挑むタイプ。",
+    "destiny": "困難を突破して道を切り開く。",
+    "story_hook": ["big_challenge", "unexpected_success"]
+  },
+  "35": {
+    "number": 35,
+    "grade": "gold",
+    "constellation": "時空座",
+    "keyword": "成長・拡大",
+    "personality": "成長意欲が高く視野が広い。",
+    "behavior": "学びと挑戦を繰り返す。",
+    "destiny": "大きく育つ人生展開。",
+    "story_hook": ["study_abroad", "mentor_meet"]
+  },
+
+  "36": {
+    "number": 36,
+    "grade": "silver",
+    "constellation": "時空座",
+    "keyword": "変動・切替",
+    "personality": "転機が多く、環境変化が大きい。",
+    "behavior": "変化を怖がらず前に進む。",
+    "destiny": "人生の流れが何度も切り替わる。",
+    "story_hook": ["big_move", "career_shift"]
+  },
+  "37": {
+    "number": 37,
+    "grade": "silver",
+    "constellation": "時空座",
+    "keyword": "意思・自立",
+    "personality": "自立心が強く、意志も固い。",
+    "behavior": "単独行動を好む。",
+    "destiny": "独立して成功する人生。",
+    "story_hook": ["runaway_attempt", "solo_path"]
+  },
+  "38": {
+    "number": 38,
+    "grade": "silver",
+    "constellation": "時空座",
+    "keyword": "調和・優しさ",
+    "personality": "優しく、調和を作り出すタイプ。",
+    "behavior": "周囲を気遣い環境を整える。",
+    "destiny": "愛され、助けられる人生。",
+    "story_hook": ["help_many", "emotional_gift"]
+  },
+  "39": {
+    "number": 39,
+    "grade": "silver",
+    "constellation": "時空座",
+    "keyword": "完了・転換",
+    "personality": "物事をやり切る力を持つ。",
+    "behavior": "最後まで粘るタイプ。",
+    "destiny": "一つの局面を完了させ、新しい流れを迎える。",
+    "story_hook": ["task_finish", "closure_event"]
+  },
+  "40": {
+    "number": 40,
+    "grade": "silver",
+    "constellation": "時空座",
+    "keyword": "節目・区切り",
+    "personality": "節目を大切にし、整理整頓が得意。",
+    "behavior": "切替が早く、物事に区切りをつける。",
+    "destiny": "節目ごとに人生が大きく変わる。",
+    "story_hook": ["cycle_change", "timing_shift"]
+  },
+
+  "41": {
+    "number": 41,
+    "grade": "gold",
+    "constellation": "変容座",
+    "keyword": "再生・変容",
+    "personality": "逆境を力に変える再生力が強い。",
+    "behavior": "大きく変身するタイミングがある。",
+    "destiny": "破壊と再生を繰り返す人生。",
+    "story_hook": ["phoenix_event", "identity_change"]
+  },
+  "42": {
+    "number": 42,
+    "grade": "gold",
+    "constellation": "変容座",
+    "keyword": "調整・改善",
+    "personality": "現実的に改善点を見つけ修正していく。",
+    "behavior": "細部までこだわる。",
+    "destiny": "環境を整え発展させる使命。",
+    "story_hook": ["repair_role", "family_fix"]
+  },
+  "43": {
+    "number": 43,
+    "grade": "gold",
+    "constellation": "変容座",
+    "keyword": "深化・探究",
+    "personality": "一つの分野を深めて専門性を高める。",
+    "behavior": "徹底的に調べるタイプ。",
+    "destiny": "深い学びから成果を生む。",
+    "story_hook": ["library_child", "obsession"]
+  },
+  "44": {
+    "number": 44,
+    "grade": "gold",
+    "constellation": "変容座",
+    "keyword": "支配・統率",
+    "personality": "カリスマ性があり、トップに立ちやすい。",
+    "behavior": "責任を引き受ける立場へ向かう。",
+    "destiny": "組織や人を動かす役割。",
+    "story_hook": ["boss_child", "power_conflict"]
+  },
+  "45": {
+    "number": 45,
+    "grade": "gold",
+    "constellation": "変容座",
+    "keyword": "拡散・伝達",
+    "personality": "情報を広め、人に伝える力が強い。",
+    "behavior": "動きが早く、変化を恐れない。",
+    "destiny": "情報の媒介者となる。",
+    "story_hook": ["messenger_role", "social_center"]
+  },
+
+  "46": {
+    "number": 46,
+    "grade": "silver",
+    "constellation": "変容座",
+    "keyword": "解放・手放し",
+    "personality": "不要なものを手放し、新しい流れに乗る。",
+    "behavior": "決断が早く、切替上手。",
+    "destiny": "過去を整理して次に進む人生。",
+    "story_hook": ["breakup_event", "release"]
+  },
+  "47": {
+    "number": 47,
+    "grade": "silver",
+    "constellation": "変容座",
+    "keyword": "調律・バランス",
+    "personality": "自他のバランスを整える才能。",
+    "behavior": "穏やかで調和を生む。",
+    "destiny": "多方面のバランスを取る役割。",
+    "story_hook": ["mediator_role", "calm_adjust"]
+  },
+  "48": {
+    "number": 48,
+    "grade": "silver",
+    "constellation": "変容座",
+    "keyword": "融合・統合",
+    "personality": "異なるものを組み合わせ新しい形をつくる。",
+    "behavior": "複数の視点を取り入れる。",
+    "destiny": "統合者として動く。",
+    "story_hook": ["bridge_role", "mix_family"]
+  },
+  "49": {
+    "number": 49,
+    "grade": "silver",
+    "constellation": "変容座",
+    "keyword": "節制・抑制",
+    "personality": "慎重で規律を守りやすい。",
+    "behavior": "やりすぎず、バランスよく行動。",
+    "destiny": "節度ある生き方が開運。",
+    "story_hook": ["strict_home", "discipline"]
+  },
+  "50": {
+    "number": 50,
+    "grade": "silver",
+    "constellation": "変容座",
+    "keyword": "完成・総仕上げ",
+    "personality": "まとめ上げる力が強い。",
+    "behavior": "物事を最後までやり切る。",
+    "destiny": "大きなプロジェクトを完成させる役割。",
+    "story_hook": ["final_stage", "big_finish"]
+  },
+
+  "51": {
+    "number": 51,
+    "grade": "gold",
+    "constellation": "叡智座",
+    "keyword": "知性・判断",
+    "personality": "高い判断力と知性を持つ。",
+    "behavior": "落ち着いて合理的に行動。",
+    "destiny": "知性を広め導く使命。",
+    "story_hook": ["top_student", "wise_child"]
+  },
+  "52": {
+    "number": 52,
+    "grade": "gold",
+    "constellation": "叡智座",
+    "keyword": "精神性・洞察",
+    "personality": "精神性が高く、洞察力に優れる。",
+    "behavior": "物事の裏側を見て判断する。",
+    "destiny": "精神的な学びが深い。",
+    "story_hook": ["spiritual_event", "teacher_meet"]
+  },
+  "53": {
+    "number": 53,
+    "grade": "gold",
+    "constellation": "叡智座",
+    "keyword": "導き・守護",
+    "personality": "周囲に影響を与える力がある。",
+    "behavior": "人を導き、アドバイスをする立場。",
+    "destiny": "人を導く役割。",
+    "story_hook": ["mentor_role", "guidance"]
+  },
+  "54": {
+    "number": 54,
+    "grade": "gold",
+    "constellation": "叡智座",
+    "keyword": "安定・要",
+    "personality": "組織や家庭の中心となる安定性。",
+    "behavior": "落ち着いて周囲を支える。",
+    "destiny": "中心的存在として動く。",
+    "story_hook": ["family_pillar", "solid_base"]
+  },
+  "55": {
+    "number": 55,
+    "grade": "gold",
+    "constellation": "叡智座",
+    "keyword": "発展・未来",
+    "personality": "未来志向で大きな発展性。",
+    "behavior": "新しい方向へ行動する。",
+    "destiny": "未来を切り開く役割。",
+    "story_hook": ["innovation_child", "future_focus"]
+  },
+
+  "56": {
+    "number": 56,
+    "grade": "silver",
+    "constellation": "叡智座",
+    "keyword": "整理・区切り",
+    "personality": "きれいに整理し、物事を整える。",
+    "behavior": "過去を手放し、新しい流れを作る。",
+    "destiny": "整理と区切りの人生テーマ。",
+    "story_hook": ["move_house", "closure"]
+  },
+  "57": {
+    "number": 57,
+    "grade": "silver",
+    "constellation": "叡智座",
+    "keyword": "内省・反省",
+    "personality": "内面を深く見つめる内省型。",
+    "behavior": "慎重で静かに考えるタイプ。",
+    "destiny": "精神的な成長が大きい。",
+    "story_hook": ["quiet_phase", "guilt_event"]
+  },
+  "58": {
+    "number": 58,
+    "grade": "silver",
+    "constellation": "叡智座",
+    "keyword": "選択・決断",
+    "personality": "重要な決断を任されることが多い。",
+    "behavior": "冷静に物事を選び取る。",
+    "destiny": "人生の岐路での選択が鍵。",
+    "story_hook": ["important_choice", "crossroads"]
+  },
+  "59": {
+    "number": 59,
+    "grade": "silver",
+    "constellation": "叡智座",
+    "keyword": "浄化・手放し",
+    "personality": "不要なものを浄化し、新しい道を拓く。",
+    "behavior": "変化を受け入れ浄化していく。",
+    "destiny": "浄化と再スタートの繰り返し。",
+    "story_hook": ["purification", "spiritual_shift"]
+  },
+  "60": {
+    "number": 60,
+    "grade": "silver",
+    "constellation": "叡智座",
+    "keyword": "集合・結実",
+    "personality": "多くの経験が実り、人生が成熟する。",
+    "behavior": "落ち着きと包容力がある。",
+    "destiny": "集大成の人生を歩む。",
+    "story_hook": ["legacy", "grand_finish"]
+  }
+}
+

@@ -1,298 +1,390 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SupportLog — 施設向け 心理支援アプリ（Adlerベース）</title>
-  <style>
-    :root{--bg:#0f1724;--card:#0b1220;--accent:#60a5fa;--muted:#94a3b8;--good:#059669;--warn:#f97316;--danger:#ef4444;}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial; background:linear-gradient(180deg,#071027 0%, #071827 60%);color:#e6eef8}
-    .wrap{max-width:1100px;margin:24px auto;padding:18px}
-    header{display:flex;align-items:center;gap:18px}
-    h1{margin:0;font-size:20px}
-    .roles{margin-left:auto;display:flex;gap:8px}
-    .role-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
-    .role-btn.active{border-color:rgba(96,165,250,0.9);color:var(--accent)}
-    main{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    .row{display:flex;gap:8px}
-    input[type='range']{width:100%}
-    textarea{width:100%;min-height:96px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);padding:10px;background:transparent;color:inherit}
-    .small{font-size:12px;color:var(--muted)}
-    .btn{background:var(--accent);color:#06203b;border:none;padding:8px 12px;border-radius:10px;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-    .log-list{max-height:420px;overflow:auto;margin-top:10px}
-    .log-item{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);margin-bottom:8px}
-    .tag{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.02);display:inline-block;margin-right:8px}
-    .suggest{background:linear-gradient(90deg,#04202a, #062434);padding:10px;border-radius:8px;margin-top:8px}
-    footer{margin-top:18px;color:var(--muted);font-size:13px}
-    .flex-col{display:flex;flex-direction:column;gap:8px}
-    .priority{display:flex;gap:8px;flex-wrap:wrap}
-    .danger{color:var(--danger)}
-    .warn{color:var(--warn)}
-    .good{color:var(--good)}
-    .divider{height:1px;background:rgba(255,255,255,0.02);margin:10px 0}
-    .role-note{font-size:13px;color:var(--muted);margin-top:6px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>運命の六属性 診断ツール（内部）</title>
+<meta name="description" content="占い師専用・運命の六属性診断ツール（内部利用）。生年月日・属性・手相で個人／相性／グループ診断を生成します。">
+
+<style>
+  :root{
+    --bg:#ffffff; --card:#fbfbfd; --muted:#6b7280; --text:#0f172a;
+    --accent:#0f172a; --soft:#f3f4f6; --border:#e6e9ef;
+    --card-radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","メイリオ",Noto Sans JP,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased;
+  }
+  header{background:linear-gradient(180deg, #ffffff 40%, #fbfbff 100%);border-bottom:1px solid var(--border);padding:14px 18px}
+  header h1{margin:0;font-size:18px;letter-spacing:0.2px}
+  .container{max-width:1100px;margin:18px auto;padding:12px}
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+  .card{background:var(--card);border-radius:var(--card-radius);padding:14px;border:1px solid var(--border);box-shadow:0 6px 18px rgba(15,23,42,0.04)}
+  label{display:block;margin:8px 0 6px;font-weight:700;color:var(--text);font-size:14px}
+  input,select,button,textarea{font-size:14px;padding:10px;border-radius:8px;border:1px solid var(--border);width:100%;background:transparent;color:var(--text)}
+  .row{display:flex;gap:10px}
+  .col{flex:1}
+  .small{font-size:13px;color:var(--muted)}
+  .out{white-space:pre-wrap;background:#0f172a;color:#fff;padding:14px;border-radius:10px;min-height:160px;overflow:auto;font-family:ui-monospace,Menlo,Monaco,"Courier New",monospace}
+  .btn{background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+  .btn.secondary{background:#eef2f7;color:var(--text);border:1px solid var(--border)}
+  .muted{color:var(--muted);font-size:13px}
+  .meta{font-size:13px;color:var(--muted);margin-top:8px}
+  .members-list div{padding:8px;border-radius:8px;background:#fff;margin-bottom:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .kbd{display:inline-block;padding:4px 8px;border-radius:6px;background:#f3f4f6;border:1px solid var(--border);font-size:12px;color:var(--muted)}
+  footer{max-width:1100px;margin:18px auto;padding:8px 12px;color:var(--muted);font-size:13px}
+  @media (max-width:980px){ .grid{grid-template-columns:1fr} .out{min-height:220px} }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>SupportLog — 施設向け 心理支援アプリ（Adler-informed）</h1>
-      <div class="roles" aria-hidden>
-        <button id="role-self" class="role-btn">本人入力</button>
-        <button id="role-staff" class="role-btn active">スタッフ入力</button>
-        <button id="role-family" class="role-btn">家族入力</button>
-      </div>
-    </header>
+<header>
+  <h1>運命の六属性 診断ツール（占い師用・内部）</h1>
+</header>
 
-    <main>
-      <section class="card">
-        <div class="flex-col">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <label>対象（ID / 名前）</label>
-              <input id="target" placeholder="例: 山田太郎" style="width:260px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit" />
-            </div>
-            <div>
-              <label>日時</label>
-              <div id="now" class="small"></div>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <label>感情（0:非常に低い → 10:非常に高い）</label>
-          <input id="mood" type="range" min="0" max="10" value="5" />
-          <div class="row"><div class="small">現在の値: <span id="mood-val">5</span></div><div style="margin-left:auto" class="small">過去平均: <span id="mood-avg">--</span></div></div>
-
-          <label style="margin-top:8px">エネルギー / 活動性（0-10）</label>
-          <input id="energy" type="range" min="0" max="10" value="5" />
-
-          <label style="margin-top:8px">主観メモ（出来事・観察・発言など）</label>
-          <textarea id="note" placeholder="例: 朝食を拒否。午前中に落ち着かず、窓を叩く発言あり。"></textarea>
-
-          <label style="margin-top:8px">タグ（カンマ区切り）</label>
-          <input id="tags" placeholder="例: 過集中,睡眠不足" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit" />
-
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="save" class="btn">記録して判定</button>
-            <button id="quick-family" class="btn ghost">家族へテンプレ送信</button>
-            <button id="export" class="role-btn">CSVエクスポート</button>
-          </div>
-
-          <div class="role-note" id="role-note">操作はスタッフモードです。入力者を切り替えて運用してください。</div>
-
-          <div class="divider"></div>
-
-          <div>
-            <label>自動判定（簡易）</label>
-            <div id="diagnosis" class="suggest small">まだ記録がありません。</div>
-            <div id="adler-suggestion" class="suggest small" style="margin-top:6px">アドラー心理学に基づく支援メモはここに表示されます。</div>
-          </div>
-
-        </div>
-      </section>
-
-      <aside class="card">
-        <div>
-          <h3 style="margin:0">ログ</h3>
-          <div class="small">過去の記録（ローカル保存）</div>
-          <div class="log-list" id="log-list" aria-live="polite"></div>
-
-          <div class="divider"></div>
-          <label>即時対応テンプレ（スタッフ）</label>
-          <div class="priority" id="staff-templates">
-            <div class="tag">穏やかに接する</div>
-            <div class="tag">短い肯定（例: よく知らせてくれてありがとう）</div>
-            <div class="tag">行動の分離（例: 「行為は問題、人は無関係」）</div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>家族送信用テンプレ</label>
-            <div class="small">家族向けには安心を優先した表現。診断や専門的表現は避けます。</div>
-            <div id="family-template" class="suggest small" style="margin-top:6px"></div>
-          </div>
-
-          <div class="divider"></div>
-          <label>注意サイン</label>
-          <div id="signs" class="small">ここに重大なサイン（自傷念慮、急性混乱など）が表示されます。</div>
-
-        </div>
-      </aside>
-    </main>
-
-    <footer class="card">
+<main class="container">
+  <div class="grid">
+    <!-- left: main controls -->
+    <section class="card">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
-          <strong>運用ヒント</strong>
-          <div class="small">記録は日付と対象を明確に。重大事象は電話で直接連絡後、ここに記録してください。</div>
+          <div style="font-weight:800;font-size:16px">クライアント情報（非保存）</div>
+          <div class="small">対面専用。結果は画面で確認し、読み上げまたはコピーして提供してください。</div>
         </div>
-        <div>
-          <button id="clear" class="role-btn">ローカルを消去</button>
+        <div class="small kbd">非公開用</div>
+      </div>
+
+      <label>お名前（任意）</label>
+      <input id="name" placeholder="例：田中 花子（省略可）"/>
+
+      <div class="row" style="margin-top:8px">
+        <div class="col">
+          <label>生年月日</label>
+          <input id="birth" type="date" />
+        </div>
+        <div class="col">
+          <label>属性（任意）</label>
+          <select id="attribute">
+            <option value="">（自動判定/選択）</option>
+            <option value="fire">火</option>
+            <option value="water">水</option>
+            <option value="wind">風</option>
+            <option value="sky">空</option>
+            <option value="light">光</option>
+            <option value="dark">闇</option>
+          </select>
         </div>
       </div>
-    </footer>
+
+      <label>手相タイプ（観察で選択）</label>
+      <select id="hand">
+        <option value="">選択（推奨：観察で選ぶ）</option>
+        <option value="masuke">マスカケ</option>
+        <option value="support">支援型</option>
+        <option value="free">自由型</option>
+        <option value="leader">統率型</option>
+        <option value="talk">対話型</option>
+        <option value="late">晩成型</option>
+      </select>
+
+      <label style="margin-top:8px">行動タイプ（任意）</label>
+      <select id="action">
+        <option value="">（自動推定）</option>
+        <option value="support">支援</option>
+        <option value="free">自由</option>
+        <option value="leader">統率</option>
+        <option value="talk">対話</option>
+        <option value="art">芸術</option>
+        <option value="duty">実務</option>
+        <option value="calm">静観</option>
+      </select>
+
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button id="runIndividual" class="btn">個人診断を生成</button>
+        <button id="runGroupMode" class="btn secondary">グループ診断</button>
+      </div>
+
+      <div class="meta">
+        <div>・出力は画面表示のみ（保存しません）。</div>
+        <div>・結果は編集してから渡すことができます。</div>
+      </div>
+    </section>
+
+    <!-- right: output / utilities -->
+    <aside>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800">出力（読み上げ用）</div>
+          <div class="small muted">占い師が読み上げるテキストを表示</div>
+        </div>
+
+        <div style="margin-top:10px">
+          <div id="output" class="out">ここに診断テキストが表示されます。</div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="copy" class="btn secondary">クリップボードにコピー</button>
+          <button id="download" class="btn">結果をダウンロード</button>
+          <button id="clear" class="btn secondary">クリア</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800">クイック操作</div>
+          <div class="small muted">便利ショートカット</div>
+        </div>
+        <div style="margin-top:8px" class="small">
+          <div>• 生年月日を入れると自動で命数が算出されます。</div>
+          <div>• グループ診断は2人以上で実行してください。</div>
+          <div>• 出力は画面で編集してからお渡しください。</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div style="font-weight:800">バージョン情報</div>
+        <div class="muted" style="margin-top:6px">運命の六属性 診断ツール — 完成版（2025-12-12）</div>
+      </div>
+    </aside>
   </div>
 
-  <script>
-    // --- Simple facility-ready single-file app
-    const nowEl = document.getElementById('now');
-    const mood = document.getElementById('mood');
-    const moodVal = document.getElementById('mood-val');
-    const energy = document.getElementById('energy');
-    const note = document.getElementById('note');
-    const tags = document.getElementById('tags');
-    const save = document.getElementById('save');
-    const logList = document.getElementById('log-list');
-    const diagnosis = document.getElementById('diagnosis');
-    const adlerSuggestion = document.getElementById('adler-suggestion');
-    const familyTemplate = document.getElementById('family-template');
-    const roleNote = document.getElementById('role-note');
-    const roleSelf = document.getElementById('role-self');
-    const roleStaff = document.getElementById('role-staff');
-    const roleFamily = document.getElementById('role-family');
-    const target = document.getElementById('target');
-    const quickFamily = document.getElementById('quick-family');
-    const exportBtn = document.getElementById('export');
-    const clearBtn = document.getElementById('clear');
+  <!-- group panel (below main grid) -->
+  <section id="groupPanel" class="card" style="margin-top:18px;display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800">グループ診断モード</div>
+      <div class="small muted">2人以上で有効</div>
+    </div>
 
-    function nowStr(){ const d=new Date(); return d.toLocaleString(); }
-    nowEl.textContent = nowStr();
-    setInterval(()=>nowEl.textContent = nowStr(), 60000);
+    <div style="margin-top:10px" class="row">
+      <input id="memberName" placeholder="名前（省略可）" />
+      <input id="memberBirth" type="date" />
+      <select id="memberAttribute">
+        <option value="">属性（任意）</option>
+        <option value="fire">火</option><option value="water">水</option>
+        <option value="wind">風</option><option value="sky">空</option>
+        <option value="light">光</option><option value="dark">闇</option>
+      </select>
+      <select id="memberHand">
+        <option value="">手相</option>
+        <option value="masuke">マスカケ</option><option value="support">支援型</option>
+        <option value="free">自由型</option><option value="leader">統率型</option>
+        <option value="talk">対話型</option><option value="late">晩成型</option>
+      </select>
+    </div>
 
-    mood.addEventListener('input', ()=> moodVal.textContent = mood.value);
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button id="addMember" class="btn secondary">メンバー追加</button>
+      <button id="runGroup" class="btn">グループ診断を実行</button>
+      <button id="exitGroup" class="btn secondary">終了</button>
+    </div>
 
-    // role management
-    let role = 'staff';
-    function setRole(r){ role=r; [roleSelf,roleStaff,roleFamily].forEach(b=>b.classList.remove('active')); document.getElementById('role-'+r).classList.add('active'); roleNote.textContent = (r==='staff')? '操作はスタッフモードです。入力者を切り替えて運用してください。' : (r==='self')? '本人入力モード：質問は簡潔に。プライバシーに配慮して記録してください。' : '家族入力モード：観察と事実を中心に記録してください。'; }
-    [roleSelf,roleStaff,roleFamily].forEach(b=>b.addEventListener('click', ()=> setRole(b.id.replace('role-',''))));
-    setRole('staff');
+    <div style="margin-top:12px" class="members-list" id="members"></div>
+  </section>
+</main>
 
-    // storage
-    const KEY = 'supportlog_records_v1';
-    function load(){ try{ return JSON.parse(localStorage.getItem(KEY) || '[]') } catch(e){return []} }
-    function saveAll(arr){ localStorage.setItem(KEY, JSON.stringify(arr)) }
-    function addRecord(rec){ const a=load(); a.unshift(rec); saveAll(a); renderLogs(); }
-
-    // render
-    function renderLogs(){ const a=load(); logList.innerHTML=''; a.slice(0,200).forEach(r=>{ const e=document.createElement('div'); e.className='log-item'; e.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between"><div><strong>${r.target||'──'}</strong> <span class="small">(${r.role})</span></div><div class="small">${r.time}</div></div><div class="small">Mood:${r.mood} Energy:${r.energy} Tags:${r.tags||''}</div><div style="margin-top:6px">${escapeHtml(r.note||'')}</div>`; logList.appendChild(e); }); updateAverages(); }
-
-    function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
-
-    function updateAverages(){ const a=load(); if(!a.length){ document.getElementById('mood-avg').textContent='--'; return;} const avg = (a.reduce((s,x)=>s+Number(x.mood||0),0)/a.length).toFixed(1); document.getElementById('mood-avg').textContent = avg; }
-
-    renderLogs();
-
-    // simple anomaly & support logic
-    function simpleDiagnosis(rec){
-      // rules: low energy + low mood -> watch for withdrawal
-      const m = Number(rec.mood), e = Number(rec.energy);
-      let flags = [];
-      if(m<=2 && e<=3) flags.push('withdrawal');
-      if(m>=8 && e>=8) flags.push('overactivation');
-      if(rec.tags && rec.tags.includes('被害妄想')) flags.push('paranoid');
-      if(rec.tags && rec.tags.includes('自傷')) flags.push('selfharm');
-      if(rec.note && /自殺|死にたい|消えたい/.test(rec.note)) flags.push('suicidal_language');
-      return flags;
-    }
-
-    function adlerAdvice(rec,flags){
-      // produce short guidance lines based on Adler psychology and staff/family role
-      const adv = [];
-      // base: encourage courage, separate task and person
-      adv.push('短い勇気づけを使う: 「よく知らせてくれてありがとう。今のことを一緒に考えましょう。」');
-      adv.push('課題の分離: 行動は問題、本人は価値ある存在であることを示す短文を入れる。');
-      if(flags.includes('withdrawal')) adv.push('観察: 小さな共同作業（飲み物を一緒に用意等）で社会的繋がりを促進。');
-      if(flags.includes('overactivation')) adv.push('落ち着ける短い行動提案: 深呼吸3回→短い移動（椅子に座る）など');
-      if(flags.includes('paranoid')) adv.push('被害感がある場合は否定せず「それは不安ですね。今は安全です」と安心を優先');
-      if(flags.includes('selfharm')||flags.includes('suicidal_language')) adv.push('**安全対応必須**: 直ちに医療連携・上位者へ連絡。緊急なら救急対応。');
-      return adv;
-    }
-
-    function familyTemplateFor(rec,flags){
-      // neutral, non-alarming family message
-      const parts = [];
-      parts.push(`${rec.time} の記録: ${rec.target || '対象'} の様子を観察しました。`);
-      parts.push(`短く: 気分(${rec.mood}/10), 活動(${rec.energy}/10)。`);
-      if(rec.note) parts.push(`観察メモ: ${rec.note}`);
-      parts.push('対応方針: 当面は安定化を優先し、落ち着いた接し方を行っています。');
-      if(flags.includes('suicidal_language')||flags.includes('selfharm')) parts.push('緊急性があるため、医療対応を検討しています（施設内で相談済）。');
-      return parts.join('\n');
-    }
-
-    save.addEventListener('click', ()=>{
-      const rec = {
-        time: new Date().toLocaleString(),
-        role, target: target.value.trim(), mood: mood.value, energy: energy.value, note: note.value.trim(), tags: tags.value.trim(), meta: {ua: navigator.userAgent}
-      };
-      // detect flags
-      const flags = simpleDiagnosis(rec);
-      addRecord(rec);
-
-      // update UI diagnosis and suggestions
-      if(flags.length===0){ diagnosis.textContent = '判定: 通常レンジ（観察継続）。'; diagnosis.className='suggest small'; }
-      else if(flags.includes('suicidal_language')||flags.includes('selfharm')){ diagnosis.innerHTML = '<strong class="danger">緊急サイン検知 — 医療連携を実行してください</strong>'; }
-      else { diagnosis.textContent = '判定: 注意サインあり — 詳細を確認してください。'; }
-
-      const adv = adlerAdvice(rec, flags);
-      adlerSuggestion.innerHTML = adv.map(s=>'• '+s).join('<br>');
-
-      familyTemplate.textContent = familyTemplateFor(rec, flags);
-
-      alert('記録完了 — ローカルに保存され、判定と支援案を画面に表示しました。');
-    });
-
-    quickFamily.addEventListener('click', ()=>{ if(!familyTemplate.textContent) return alert('まず記録してください'); navigator.clipboard.writeText(familyTemplate.textContent).then(()=>alert('家族向けテンプレをクリップボードにコピーしました。')) });
-
-    exportBtn.addEventListener('click', ()=>{
-      const a = load(); if(!a.length) return alert('データがありません');
-      const csv = ['time,target,role,mood,energy,tags,note'].concat(a.map(r=>`${csvSafe(r.time)},${csvSafe(r.target)},${csvSafe(r.role)},${r.mood},${r.energy},${csvSafe(r.tags)},${csvSafe(r.note)}`)).join('\n');
-      const blob = new Blob([csv], {type:'text/csv'});
-      const url = URL.createObjectURL(blob);
-      const ael = document.createElement('a'); ael.href=url; ael.download = 'supportlog_export.csv'; document.body.appendChild(ael); ael.click(); ael.remove(); URL.revokeObjectURL(url);
-    });
-
-    function csvSafe(s){ if(!s) return '""'; return '"'+(s.replace(/"/g,'""'))+'"'; }
-
-    clearBtn.addEventListener('click', ()=>{ if(confirm('ローカル保存された全データを削除しますか？')){ localStorage.removeItem(KEY); renderLogs(); } });
-
-    // initial demo content
-    if(!load().length){ addRecord({time: new Date().toLocaleString(), role:'system', target:'デモ: 佐藤', mood:6, energy:5, tags:'', note:'朝に少し落ち着きがない様子。', meta:{}}); }
-
-  </script>
-</body>
-</html>
-
-<!-- ▼▼ 感覚的UIレイヤー（数値の代替表示）追記 2025-12-09 ▼▼ -->
-<section id="sense-ui" style="margin-top:24px;padding:16px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08)">
-  <h2 style="font-size:20px;margin-bottom:8px">いまの状態（感覚表示）</h2>
-  <p id="sense-label" style="font-size:18px;margin:6px 0">🟢 安定</p>
-  <div style="height:16px;background:#eee;border-radius:999px;overflow:hidden">
-    <div id="sense-bar" style="height:100%;width:20%;background:linear-gradient(90deg,#6ee7b7,#34d399)"></div>
-  </div>
-  <p id="sense-message" style="margin-top:10px;font-size:14px">今日は無理せず、今できていることを続ける日です。</p>
-</section>
+<footer>
+  <div class="muted">注意：このツールは占い補助ツールです。医療行為の代替ではありません。機密情報は保存しないでください。</div>
+</footer>
 
 <script>
-// 数値→感覚変換マッピング
-function toSenseView(score){
-  let label="🟢 安定";
-  let msg="今日は無理せず、今できていることを続ける日です。";
-  let width="20%";
-  if(score>=25 && score<50){label="🟡 やや注意";msg="少し疲れが出やすい状態。休憩を意識しましょう。";width="45%";}
-  if(score>=50 && score<75){label="🟠 要サポート";msg="無理が重なりやすい時期。誰かに頼ってOKです。";width="70%";}
-  if(score>=75){label="🔴 緊急";msg="今は一人で抱えず、すぐ周囲と相談しましょう。";width="95%";}
-  document.getElementById("sense-label").innerText=label;
-  document.getElementById("sense-message").innerText=msg;
-  document.getElementById("sense-bar").style.width=width;
+/* ========= データローディング（data/*.json を期待） ========= */
+const DATA = {
+  flattype_traits:{},
+  story:{},
+  compatibility:{},
+  group:{},
+  meta:{}
+};
+
+async function loadData() {
+  const list = [
+    'data/flattype_traits.json',
+    'data/story.json',
+    'data/compatibility.json',
+    'data/group.json',
+    'data/meta.json'
+  ];
+  for(const p of list){
+    try{
+      const res = await fetch(p);
+      if(res.ok){
+        const j = await res.json();
+        if(p.includes('flattype')) DATA.flattype_traits = j;
+        if(p.includes('story')) DATA.story = j;
+        if(p.includes('compatibility')) DATA.compatibility = j;
+        if(p.includes('group')) DATA.group = j;
+        if(p.includes('meta')) DATA.meta = j;
+      } else {
+        console.info('data not found:',p);
+      }
+    }catch(e){
+      console.info('load failed',p,e);
+    }
+  }
+}
+loadData();
+
+/* ========= util: 命数計算（堅牢簡易版） ========= */
+function calcLifeNumFromDate(dateStr){
+  if(!dateStr) return null;
+  // YYYY-MM-DD -> sum digits -> reduce to 1..60 deterministically
+  const digits = dateStr.replace(/-/g,'').split('').map(d=>parseInt(d,10)||0);
+  let s = digits.reduce((a,b)=>a+b,0);
+  // cross-sum until <= 60
+  while(s > 60) {
+    s = s.toString().split('').map(n=>parseInt(n,10)).reduce((a,b)=>a+b,0);
+  }
+  if(s <= 0) s = 1;
+  return s;
 }
 
-// 既存の数値結果がある前提で自動反映（score変数があれば吸収）
-try{
-  if(typeof score !== 'undefined') toSenseView(score);
-}catch(e){console.log("sense-ui standby");}
-</script>
-<!-- ▲▲ 感覚的UIレイヤー 追記ここまで ▲▲ -->
+/* ========= 出力組立ロジック ========= */
+function getTraitText(lifenum){
+  const key = lifenum ? `num${lifenum}` : null;
+  if(key && DATA.flattype_traits[key]) {
+    return DATA.flattype_traits[key].text || DATA.flattype_traits[key].short || '';
+  }
+  // fallback auto generate basic line
+  return lifenum ? `命数${lifenum}の基本傾向（自動生成）` : '命数未指定の傾向';
+}
 
+function getStoryText(lifenum, hand){
+  const key = lifenum ? `num${lifenum}` : null;
+  if(key && DATA.story[key]) {
+    // prefer hand-specific intro if exists
+    if(hand && DATA.story[key].hand && DATA.story[key].hand[hand]) {
+      return DATA.story[key].hand[hand];
+    }
+    return DATA.story[key].text || DATA.story[key].intro || '';
+  }
+  return '過去の傾向（自動補完）';
+}
+
+function assembleIndividual({name,birth,attribute,hand,action}){
+  const lifenum = calcLifeNumFromDate(birth);
+  const lines = [];
+  lines.push(`${name || 'お客様'} さんの診断`);
+  if(birth) lines.push(`生年月日: ${birth}（命数 ${lifenum}）`);
+  if(attribute) lines.push(`属性: ${attribute}`);
+  if(hand) lines.push(`手相: ${hand}`);
+  if(action) lines.push(`行動タイプ（目安）: ${action}`);
+  lines.push('');
+  lines.push('■ 性格・傾向');
+  lines.push(getTraitText(lifenum));
+  lines.push('');
+  lines.push('■ 過去・育ちの傾向');
+  lines.push(getStoryText(lifenum, hand));
+  lines.push('');
+  lines.push('■ 相性ワンポイント（抜粋）');
+  // show top 2 compatible attributes if available
+  if(DATA.compatibility && DATA.compatibility.pair_example) {
+    lines.push(DATA.compatibility.pair_example);
+  } else {
+    lines.push('対人は「距離感の調整」が鍵です。');
+  }
+  lines.push('');
+  lines.push('■ ワンポイント助言');
+  lines.push('小さな行動を増やすこと。無理はしない。');
+  return lines.join('\n');
+}
+
+/* ========= UI handlers ========= */
+function showOutput(text){
+  document.getElementById('output').textContent = text;
+}
+
+document.getElementById('runIndividual').addEventListener('click', ()=>{
+  const name = document.getElementById('name').value || '';
+  const birth = document.getElementById('birth').value || '';
+  const attribute = document.getElementById('attribute').value || '';
+  const hand = document.getElementById('hand').value || '';
+  const action = document.getElementById('action').value || '';
+  const txt = assembleIndividual({name,birth,attribute,hand,action});
+  showOutput(txt);
+});
+
+/* copy / download / clear */
+document.getElementById('copy').addEventListener('click', async ()=>{
+  const txt = document.getElementById('output').textContent;
+  try { await navigator.clipboard.writeText(txt); alert('コピーしました（占い用テキスト）'); }
+  catch(e){ alert('コピーできません。ブラウザの許可を確認してください。'); }
+});
+document.getElementById('download').addEventListener('click', ()=>{
+  const txt = document.getElementById('output').textContent;
+  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'diagnosis.txt';
+  a.click();
+});
+document.getElementById('clear').addEventListener('click', ()=> showOutput('ここに診断テキストが表示されます。'));
+
+/* ========= group mode ========= */
+const members = [];
+function renderMembers(){
+  const box = document.getElementById('members');
+  box.innerHTML = '';
+  members.forEach((m,idx)=>{
+    const div = document.createElement('div');
+    div.innerHTML = `<div><strong>${m.name || ('メンバー'+(idx+1))}</strong> <div class="small">${m.birth || ''} ${m.attribute||''} ${m.hand||''}</div></div>
+                     <div><button data-idx="${idx}" class="btn secondary remove">削除</button></div>`;
+    box.appendChild(div);
+  });
+  box.querySelectorAll('.remove').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const i = parseInt(btn.dataset.idx,10);
+      members.splice(i,1); renderMembers();
+    });
+  });
+}
+document.getElementById('runGroupMode').addEventListener('click', ()=> {
+  document.getElementById('groupPanel').style.display = 'block';
+});
+document.getElementById('addMember').addEventListener('click', ()=>{
+  const name = document.getElementById('memberName').value || '';
+  const birth = document.getElementById('memberBirth').value || '';
+  const attribute = document.getElementById('memberAttribute').value || '';
+  const hand = document.getElementById('memberHand').value || '';
+  const lifenum = calcLifeNumFromDate(birth);
+  members.push({name,birth,attribute,hand,lifenum});
+  renderMembers();
+  document.getElementById('memberName').value=''; document.getElementById('memberBirth').value='';
+});
+document.getElementById('runGroup').addEventListener('click', ()=>{
+  if(members.length < 2){ alert('メンバーを2名以上追加してください'); return; }
+  const report = createGroupReport(members);
+  showOutput(report);
+});
+document.getElementById('exitGroup').addEventListener('click', ()=>{
+  members.splice(0,members.length); renderMembers(); document.getElementById('groupPanel').style.display='none';
+});
+
+function createGroupReport(list){
+  const lines = [];
+  lines.push('グループ診断 — 簡易レポート');
+  lines.push(`人数: ${list.length}`);
+  lines.push('');
+  list.forEach((m,idx)=>{
+    lines.push(`--- ${m.name || ('メンバー'+(idx+1))} ---`);
+    lines.push(`命数: ${m.lifenum || '未指定'}  属性: ${m.attribute || '未指定'}  手相: ${m.hand || '未指定'}`);
+    lines.push(getTraitText(m.lifenum));
+    lines.push('');
+  });
+  // attribute balance
+  const balance = list.reduce((acc,m)=>{
+    if(m.attribute) acc[m.attribute] = (acc[m.attribute]||0)+1;
+    return acc;
+  },{});
+  lines.push('全体属性バランス: '+JSON.stringify(balance));
+  // recommend central person
+  const central = list[0].name || 'メンバー1';
+  lines.push(`推奨：${central}が中心となり、発言の場を作ると安定します。`);
+  return lines.join('\n');
+}
+
+/* initial render */
+renderMembers();
+</script>
+</body>
+</html>

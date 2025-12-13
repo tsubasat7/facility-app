@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "六属性 × 命数 × 行動型 × 家族構造補正の相性テンプレート",
+    "last_update": "2025-12-12"
+  },
+
+  "attribute_matrix": {
+    "fire": {
+      "fire": 0,
+      "water": -2,
+      "wind": +1,
+      "earth": +2,
+      "light": +1,
+      "dark": -1
+    },
+    "water": {
+      "fire": -2,
+      "water": 0,
+      "wind": -1,
+      "earth": +1,
+      "light": +2,
+      "dark": 0
+    },
+    "wind": {
+      "fire": +1,
+      "water": -1,
+      "wind": 0,
+      "earth": -2,
+      "light": +1,
+      "dark": +2
+    },
+    "earth": {
+      "fire": +2,
+      "water": +1,
+      "wind": -2,
+      "earth": 0,
+      "light": -1,
+      "dark": +1
+    },
+    "light": {
+      "fire": +1,
+      "water": +2,
+      "wind": +1,
+      "earth": -1,
+      "light": 0,
+      "dark": -2
+    },
+    "dark": {
+      "fire": -1,
+      "water": 0,
+      "wind": +2,
+      "earth": +1,
+      "light": -2,
+      "dark": 0
+    }
+  },
+
+  "numerology_bonus": {
+    "same_group": +2,
+    "neighbor_group": +1,
+    "far_group": -1,
+    "gold_silver_match": +1,
+    "gold_gold_hard": -1,
+    "silver_silver_soft": +1
+  },
+
+  "behavior_match": {
+    "support": {
+      "support": +1,
+      "free": +2,
+      "leader": +1,
+      "dialog": +2,
+      "late": 0
+    },
+    "free": {
+      "support": +2,
+      "free": 0,
+      "leader": -2,
+      "dialog": +1,
+      "late": -1
+    },
+    "leader": {
+      "support": +1,
+      "free": -2,
+      "leader": 0,
+      "dialog": -1,
+      "late": +2
+    },
+    "dialog": {
+      "support": +2,
+      "free": +1,
+      "leader": -1,
+      "dialog": 0,
+      "late": +1
+    },
+    "late": {
+      "support": 0,
+      "free": -1,
+      "leader": +2,
+      "dialog": +1,
+      "late": 0
+    }
+  },
+
+  "family_role_adjust": {
+    "father_child": -1,
+    "mother_child": +1,
+    "sibling_close_age": +1,
+    "sibling_far_age": 0,
+    "couple": {
+      "ideal_gap_small": +2,
+      "ideal_gap_large": -1
+    }
+  },
+
+  "story_bonus": {
+    "trauma_overlap": +2,
+    "goal_alignment": +3,
+    "growth_conflict": -2
+  },
+
+  "output_template": {
+    "score_range": {
+      "excellent": [8, 99],
+      "good": [3, 7],
+      "neutral": [-2, 2],
+      "bad": [-6, -3],
+      "worst": [-99, -7]
+    },
+    "comment": {
+      "excellent": "非常に良い相性。自然体でいられ、お互いの弱点を補える組み合わせです。",
+      "good": "良好な相性。少し意識するだけで関係がよりスムーズに進みます。",
+      "neutral": "普通の相性。特に良くも悪くもなく、工夫次第で変化します。",
+      "bad": "注意が必要な相性。価値観の違いから摩擦が生まれやすい傾向があります。",
+      "worst": "最も衝突しやすい相性。距離感や役割を丁寧に調整することが大切です。"
+    }
+  }
+}
