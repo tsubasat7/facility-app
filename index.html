@@ -9,9 +9,10 @@ body{font-family:sans-serif;background:#fff;margin:0}
 header{padding:16px;border-bottom:1px solid #eee}
 .container{max-width:900px;margin:auto;padding:24px}
 .card{border:1px solid #ddd;border-radius:16px;padding:16px;margin-bottom:16px}
-button{padding:10px 16px;border-radius:20px;border:1px solid #aaa}
+button{padding:10px 16px;border-radius:20px;border:1px solid #aaa;cursor:pointer}
 .run{background:#222;color:#fff;border:none}
 small{color:#666}
+input{padding:8px}
 </style>
 </head>
 <body>
@@ -24,10 +25,10 @@ small{color:#666}
 <div class="container">
 
 <div class="card">
-<label>名前</label>
+<label>名前</label><br>
 <input id="name" style="width:100%"><br><br>
 
-<label>生年月日</label>
+<label>生年月日</label><br>
 <input id="birth" type="date" style="width:100%"><br><br>
 
 <button class="run" onclick="analyze()">診断する</button>
@@ -38,47 +39,72 @@ small{color:#666}
 </div>
 
 <script>
+// 命数計算（1〜60）
 function calcMeisuu(date){
-  let sum=date.replace(/-/g,"").split("").map(Number).reduce((a,b)=>a+b,0);
-  while(sum>60){
-    sum=sum.toString().split("").reduce((a,b)=>a+Number(b),0);
+  let sum = date.replace(/-/g,"")
+    .split("")
+    .map(Number)
+    .reduce((a,b)=>a+b,0);
+
+  while(sum > 60){
+    sum = sum.toString().split("")
+      .reduce((a,b)=>a+Number(b),0);
   }
-  return sum||60;
+  return sum === 0 ? 60 : sum;
 }
 
+// JSON安全読み込み
 async function safeFetch(path){
   const r = await fetch(path);
-  if(!r.ok) throw new Error(path+" が読み込めません");
+  if(!r.ok){
+    throw new Error(path + " が読み込めません");
+  }
   return r.json();
 }
 
+// メイン診断
 async function analyze(){
-  alert("診断開始（ボタンは反応しています）");
+  const name  = document.getElementById("name").value || "未入力";
+  const birth = document.getElementById("birth").value;
 
-  const name=document.getElementById("name").value||"未入力";
-  const birth=document.getElementById("birth").value;
-  if(!birth){ alert("生年月日を入力してください"); return; }
+  if(!birth){
+    alert("生年月日を入力してください");
+    return;
+  }
 
   try{
-    const meisuu=calcMeisuu(birth);
+    const meisuu = calcMeisuu(birth);
+    const key = String(meisuu); // ★重要：文字列キー化
 
     const traits = await safeFetch("data/flattype_traits.json");
     const story  = await safeFetch("data/story.json");
 
-    const t = traits[meisuu];
-    const s = story[meisuu];
+    const t = traits[key];
+    const s = story[key];
 
-    document.getElementById("result").innerHTML=`
+    if(!t || !s){
+      throw new Error("命数 " + meisuu + " のデータが存在しません");
+    }
+
+    document.getElementById("result").innerHTML = `
       <div class="card">
         <h3>${name} さん</h3>
-        <p>命数：${meisuu}</p>
-        <h4>性格</h4><p>${t.core}</p>
-        <h4>過去</h4><p>${s.past}</p>
+        <p><b>命数：</b>${meisuu}</p>
+
+        <h4>■ 性格・傾向</h4>
+        <p>${t.core || "未定義"}</p>
+
+        <h4>■ 過去・育ち</h4>
+        <p>${s.past || "未定義"}</p>
       </div>
     `;
   }catch(e){
-    document.getElementById("result").innerHTML=
-      "<div class='card'><b>エラー:</b><br>"+e.message+"</div>";
+    document.getElementById("result").innerHTML = `
+      <div class="card">
+        <b>エラー</b><br>
+        ${e.message}
+      </div>
+    `;
   }
 }
 </script>
