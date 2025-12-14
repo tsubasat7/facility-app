@@ -2,79 +2,162 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>運命の六属性診断｜内部用</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>運命の六属性診断（内部ツール）</title>
+
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial;
-background:#fff;color:#222;margin:0}
-.container{max-width:900px;margin:auto;padding:24px}
-.card{border:1px solid #e5e5e5;border-radius:18px;padding:22px;margin-bottom:18px}
-h1,h2,h3{margin:0 0 12px}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial;
+  background:#ffffff;
+  color:#222;
+  margin:0;
+}
+header{
+  border-bottom:1px solid #eee;
+  padding:16px 24px;
+}
+h1{margin:0;font-size:22px}
+.container{
+  max-width:960px;
+  margin:auto;
+  padding:24px;
+}
+.mode-select button{
+  margin-right:8px;
+  padding:10px 16px;
+  border-radius:20px;
+  border:1px solid #ddd;
+  background:#fff;
+  cursor:pointer;
+}
+.mode-select button.active{
+  background:#222;
+  color:#fff;
+}
+.card{
+  border:1px solid #e5e5e5;
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:20px;
+}
+label{display:block;margin-top:12px}
+input,select{
+  width:100%;
+  padding:8px;
+  margin-top:4px;
+}
+button.run{
+  margin-top:16px;
+  padding:12px 20px;
+  border-radius:24px;
+  border:none;
+  background:#222;
+  color:#fff;
+  font-size:15px;
+}
 small{color:#666}
 </style>
 </head>
 
 <body>
+
+<header>
+<h1>🔮 運命の六属性診断（占い師用・内部ツール）</h1>
+<small>※来客には結果のみ提示</small>
+</header>
+
 <div class="container">
-<h1>運命の六属性診断</h1>
-<small>内部ツール／客提示は結果のみ</small>
-<div id="out"></div>
+
+<!-- モード切替（個人・相性・グループ） -->
+<section class="mode-select">
+<button onclick="setMode('single')" class="active">個人診断</button>
+<button onclick="setMode('pair')">相性診断</button>
+<button onclick="setMode('group')">グループ診断</button>
+</section>
+
+<!-- 入力 -->
+<section class="card">
+<h2>診断対象入力</h2>
+
+<label>名前</label>
+<input id="name" placeholder="例：江原 啓介">
+
+<label>生年月日</label>
+<input id="birth" type="date">
+
+<label>命数（内部計算済なら直接入力）</label>
+<input id="meisuu" type="number" placeholder="例：53">
+
+<label>手相タイプ</label>
+<select id="palm">
+  <option value="晩成型">晩成型</option>
+  <option value="支援型">支援型</option>
+  <option value="自由型">自由型</option>
+  <option value="統率型">統率型</option>
+</select>
+
+<button class="run" onclick="analyze()">診断する</button>
+</section>
+
+<!-- 結果 -->
+<section id="result"></section>
+
 </div>
 
 <script>
+let mode="single";
+function setMode(m){
+  mode=m;
+  document.querySelectorAll(".mode-select button")
+    .forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+}
+
 async function j(p){return fetch(p).then(r=>r.json())}
 
-(async()=>{
-/* 占い師入力 */
-const person={
- name:"江原 啓介",
- birth:"1983-01-28",
- meisuu:53,
- palm:"晩成型"
-};
+async function analyze(){
+  const name=document.getElementById("name").value;
+  const meisuu=document.getElementById("meisuu").value;
+  const palmType=document.getElementById("palm").value;
 
-/* JSON読込 */
-const traits=await j("data/flattype_traits.json");
-const story=await j("data/story.json");
-const num=await j("data/numerology.json");
-const palm=await j("data/palmistry.json");
-const comp=await j("data/compatibility.json");
-const nameJ=await j("data/name_judge.json");
+  const traits=await j("data/flattype_traits.json");
+  const story=await j("data/story.json");
+  const numerology=await j("data/numerology.json");
+  const palm=await j("data/palmistry.json");
+  const nameJudge=await j("data/name_judge.json");
+  const comp=await j("data/compatibility.json");
 
-/* 合成 */
-const t=traits[person.meisuu];
-const s=story[person.meisuu];
-const n=num[person.meisuu];
-const p=palm[person.palm];
-const nj=nameJ.sample;
+  const t=traits[meisuu];
+  const s=story[meisuu];
+  const n=numerology[meisuu];
+  const p=palm[palmType];
+  const nj=nameJudge.sample;
 
-/* 出力 */
-out.innerHTML=`
-<div class="card">
-<h2>${person.name} さんの診断</h2>
-<small>生年月日：${person.birth} ／ 命数 ${person.meisuu}</small>
+  document.getElementById("result").innerHTML=`
+  <section class="card">
+    <h2>${name} さんの診断結果</h2>
+    <small>命数 ${meisuu}｜${n.zodiac}（${n.metal}）</small>
 
-<h3>■ 性格・本質</h3>
-<p>${t.core}<br>
-命数${person.meisuu}（${n.zodiac}・${n.metal}）：
-${n.summary}</p>
+    <h3>■ 性格・本質</h3>
+    <p>${t.core}</p>
 
-<h3>■ 過去・育ちの傾向</h3>
-<p>${s.past}<br>${p.note}</p>
+    <h3>■ 過去・育ちの傾向</h3>
+    <p>${s.past}</p>
 
-<h3>■ 行動傾向</h3>
-<p>${t.action}<br>${p.trait}</p>
+    <h3>■ 行動特性・手相補正</h3>
+    <p>${t.action}<br>${p.trait}</p>
 
-<h3>■ 相性ワンポイント</h3>
-<p>${comp.summary}<br>${comp.warning}</p>
+    <h3>■ 相性ワンポイント</h3>
+    <p>${comp.summary}</p>
 
-<h3>■ 姓名判断補正</h3>
-<p>${nj.pattern}<br>${nj.note}</p>
+    <h3>■ 姓名判断補正</h3>
+    <p>${nj.pattern}<br>${nj.note}</p>
 
-<h3>■ ワンポイント助言</h3>
-<p>${t.advice}</p>
-</div>`;
-})();
+    <h3>■ 総合助言</h3>
+    <p>${t.advice}</p>
+  </section>`;
+}
 </script>
+
 </body>
 </html>
