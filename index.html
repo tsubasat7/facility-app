@@ -4,135 +4,84 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>運命の六属性診断（内部ツール）</title>
-
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial;background:#fff;color:#222;margin:0}
-header{border-bottom:1px solid #eee;padding:16px 24px}
-.container{max-width:960px;margin:auto;padding:24px}
-button{cursor:pointer}
-.mode-select button{margin-right:8px;padding:10px 16px;border-radius:20px;border:1px solid #ddd;background:#fff}
-.mode-select button.active{background:#222;color:#fff}
-.card{border:1px solid #e5e5e5;border-radius:18px;padding:22px;margin-bottom:20px}
-input,select{width:100%;padding:8px;margin-top:4px}
-.add{margin-top:12px}
-.run{margin-top:16px;background:#222;color:#fff;border:none;padding:12px 20px;border-radius:24px}
+body{font-family:sans-serif;background:#fff;margin:0}
+header{padding:16px;border-bottom:1px solid #eee}
+.container{max-width:900px;margin:auto;padding:24px}
+.card{border:1px solid #ddd;border-radius:16px;padding:16px;margin-bottom:16px}
+button{padding:10px 16px;border-radius:20px;border:1px solid #aaa}
+.run{background:#222;color:#fff;border:none}
 small{color:#666}
 </style>
 </head>
-
 <body>
+
 <header>
-<h1>🔮 運命の六属性診断（内部用）</h1>
-<small>結果のみ客提示</small>
+<h2>🔮 運命の六属性診断</h2>
+<small>内部用</small>
 </header>
 
 <div class="container">
 
-<section class="mode-select">
-<button onclick="setMode('single',this)" class="active">個人</button>
-<button onclick="setMode('pair',this)">相性</button>
-<button onclick="setMode('group',this)">グループ</button>
-</section>
+<div class="card">
+<label>名前</label>
+<input id="name" style="width:100%"><br><br>
 
-<section class="card">
-<h2>診断対象</h2>
-<div id="persons"></div>
-<button class="add" onclick="addPerson()">＋ 人を追加</button>
+<label>生年月日</label>
+<input id="birth" type="date" style="width:100%"><br><br>
+
 <button class="run" onclick="analyze()">診断する</button>
-</section>
+</div>
 
-<section id="result"></section>
+<div id="result"></div>
+
 </div>
 
 <script>
-let mode="single";
-
-/* モード切替（event不使用） */
-function setMode(m,btn){
-  mode=m;
-  document.querySelectorAll(".mode-select button")
-    .forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  resetPersons();
-}
-
-function resetPersons(){
-  const area=document.getElementById("persons");
-  area.innerHTML="";
-  let n = mode==="single"?1:mode==="pair"?2:3;
-  for(let i=0;i<n;i++) addPerson();
-}
-
-function addPerson(){
-  const div=document.createElement("div");
-  div.className="card";
-  div.innerHTML=`
-    <label>名前</label>
-    <input class="name">
-    <label>生年月日</label>
-    <input type="date" class="birth">
-    <label>手相</label>
-    <select class="palm">
-      <option value="晩成型">晩成型</option>
-      <option value="支援型">支援型</option>
-      <option value="自由型">自由型</option>
-      <option value="統率型">統率型</option>
-    </select>
-  `;
-  document.getElementById("persons").appendChild(div);
-}
-
-/* 命数自動計算 */
 function calcMeisuu(date){
-  if(!date) return null;
-  let sum=date.replace(/-/g,"")
-    .split("").map(Number).reduce((a,b)=>a+b,0);
+  let sum=date.replace(/-/g,"").split("").map(Number).reduce((a,b)=>a+b,0);
   while(sum>60){
-    sum = sum.toString().split("").reduce((a,b)=>a+Number(b),0);
+    sum=sum.toString().split("").reduce((a,b)=>a+Number(b),0);
   }
-  return sum===0?60:sum;
+  return sum||60;
 }
 
-async function j(p){return fetch(p).then(r=>r.json())}
+async function safeFetch(path){
+  const r = await fetch(path);
+  if(!r.ok) throw new Error(path+" が読み込めません");
+  return r.json();
+}
 
 async function analyze(){
-  const traits=await j("data/flattype_traits.json");
-  const story=await j("data/story.json");
-  const num=await j("data/numerology.json");
-  const palm=await j("data/palmistry.json");
+  alert("診断開始（ボタンは反応しています）");
 
-  let html="";
-  const persons=document.querySelectorAll("#persons .card");
+  const name=document.getElementById("name").value||"未入力";
+  const birth=document.getElementById("birth").value;
+  if(!birth){ alert("生年月日を入力してください"); return; }
 
-  for(let i=0;i<persons.length;i++){
-    const c=persons[i];
-    const name=c.querySelector(".name").value||`人物${i+1}`;
-    const birth=c.querySelector(".birth").value;
-    if(!birth){ alert("生年月日を入力してください"); return; }
-
-    const palmType=c.querySelector(".palm").value;
+  try{
     const meisuu=calcMeisuu(birth);
 
-    const t=traits[meisuu];
-    const s=story[meisuu];
-    const n=num[meisuu];
-    const p=palm[palmType];
+    const traits = await safeFetch("data/flattype_traits.json");
+    const story  = await safeFetch("data/story.json");
 
-    html+=`
-    <div class="card">
-      <h2>${name}</h2>
-      <small>命数 ${meisuu}｜${n.zodiac}（${n.metal}）</small>
-      <h3>性格</h3><p>${t.core}</p>
-      <h3>過去</h3><p>${s.past}</p>
-      <h3>行動・手相</h3><p>${t.action}<br>${p.trait}</p>
-      <h3>助言</h3><p>${t.advice}</p>
-    </div>`;
+    const t = traits[meisuu];
+    const s = story[meisuu];
+
+    document.getElementById("result").innerHTML=`
+      <div class="card">
+        <h3>${name} さん</h3>
+        <p>命数：${meisuu}</p>
+        <h4>性格</h4><p>${t.core}</p>
+        <h4>過去</h4><p>${s.past}</p>
+      </div>
+    `;
+  }catch(e){
+    document.getElementById("result").innerHTML=
+      "<div class='card'><b>エラー:</b><br>"+e.message+"</div>";
   }
-
-  document.getElementById("result").innerHTML=html;
 }
-
-resetPersons();
 </script>
+
 </body>
 </html>
