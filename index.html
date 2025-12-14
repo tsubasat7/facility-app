@@ -1,390 +1,80 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>運命の六属性 診断ツール（内部）</title>
-<meta name="description" content="占い師専用・運命の六属性診断ツール（内部利用）。生年月日・属性・手相で個人／相性／グループ診断を生成します。">
-
+<meta charset="UTF-8">
+<title>運命の六属性診断｜内部用</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  :root{
-    --bg:#ffffff; --card:#fbfbfd; --muted:#6b7280; --text:#0f172a;
-    --accent:#0f172a; --soft:#f3f4f6; --border:#e6e9ef;
-    --card-radius:12px;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","メイリオ",Noto Sans JP,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased;
-  }
-  header{background:linear-gradient(180deg, #ffffff 40%, #fbfbff 100%);border-bottom:1px solid var(--border);padding:14px 18px}
-  header h1{margin:0;font-size:18px;letter-spacing:0.2px}
-  .container{max-width:1100px;margin:18px auto;padding:12px}
-  .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
-  .card{background:var(--card);border-radius:var(--card-radius);padding:14px;border:1px solid var(--border);box-shadow:0 6px 18px rgba(15,23,42,0.04)}
-  label{display:block;margin:8px 0 6px;font-weight:700;color:var(--text);font-size:14px}
-  input,select,button,textarea{font-size:14px;padding:10px;border-radius:8px;border:1px solid var(--border);width:100%;background:transparent;color:var(--text)}
-  .row{display:flex;gap:10px}
-  .col{flex:1}
-  .small{font-size:13px;color:var(--muted)}
-  .out{white-space:pre-wrap;background:#0f172a;color:#fff;padding:14px;border-radius:10px;min-height:160px;overflow:auto;font-family:ui-monospace,Menlo,Monaco,"Courier New",monospace}
-  .btn{background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700}
-  .btn.secondary{background:#eef2f7;color:var(--text);border:1px solid var(--border)}
-  .muted{color:var(--muted);font-size:13px}
-  .meta{font-size:13px;color:var(--muted);margin-top:8px}
-  .members-list div{padding:8px;border-radius:8px;background:#fff;margin-bottom:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-  .kbd{display:inline-block;padding:4px 8px;border-radius:6px;background:#f3f4f6;border:1px solid var(--border);font-size:12px;color:var(--muted)}
-  footer{max-width:1100px;margin:18px auto;padding:8px 12px;color:var(--muted);font-size:13px}
-  @media (max-width:980px){ .grid{grid-template-columns:1fr} .out{min-height:220px} }
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial;
+background:#fff;color:#222;margin:0}
+.container{max-width:900px;margin:auto;padding:24px}
+.card{border:1px solid #e5e5e5;border-radius:18px;padding:22px;margin-bottom:18px}
+h1,h2,h3{margin:0 0 12px}
+small{color:#666}
 </style>
 </head>
+
 <body>
-<header>
-  <h1>運命の六属性 診断ツール（占い師用・内部）</h1>
-</header>
-
-<main class="container">
-  <div class="grid">
-    <!-- left: main controls -->
-    <section class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-weight:800;font-size:16px">クライアント情報（非保存）</div>
-          <div class="small">対面専用。結果は画面で確認し、読み上げまたはコピーして提供してください。</div>
-        </div>
-        <div class="small kbd">非公開用</div>
-      </div>
-
-      <label>お名前（任意）</label>
-      <input id="name" placeholder="例：田中 花子（省略可）"/>
-
-      <div class="row" style="margin-top:8px">
-        <div class="col">
-          <label>生年月日</label>
-          <input id="birth" type="date" />
-        </div>
-        <div class="col">
-          <label>属性（任意）</label>
-          <select id="attribute">
-            <option value="">（自動判定/選択）</option>
-            <option value="fire">火</option>
-            <option value="water">水</option>
-            <option value="wind">風</option>
-            <option value="sky">空</option>
-            <option value="light">光</option>
-            <option value="dark">闇</option>
-          </select>
-        </div>
-      </div>
-
-      <label>手相タイプ（観察で選択）</label>
-      <select id="hand">
-        <option value="">選択（推奨：観察で選ぶ）</option>
-        <option value="masuke">マスカケ</option>
-        <option value="support">支援型</option>
-        <option value="free">自由型</option>
-        <option value="leader">統率型</option>
-        <option value="talk">対話型</option>
-        <option value="late">晩成型</option>
-      </select>
-
-      <label style="margin-top:8px">行動タイプ（任意）</label>
-      <select id="action">
-        <option value="">（自動推定）</option>
-        <option value="support">支援</option>
-        <option value="free">自由</option>
-        <option value="leader">統率</option>
-        <option value="talk">対話</option>
-        <option value="art">芸術</option>
-        <option value="duty">実務</option>
-        <option value="calm">静観</option>
-      </select>
-
-      <div style="display:flex;gap:10px;margin-top:12px">
-        <button id="runIndividual" class="btn">個人診断を生成</button>
-        <button id="runGroupMode" class="btn secondary">グループ診断</button>
-      </div>
-
-      <div class="meta">
-        <div>・出力は画面表示のみ（保存しません）。</div>
-        <div>・結果は編集してから渡すことができます。</div>
-      </div>
-    </section>
-
-    <!-- right: output / utilities -->
-    <aside>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:800">出力（読み上げ用）</div>
-          <div class="small muted">占い師が読み上げるテキストを表示</div>
-        </div>
-
-        <div style="margin-top:10px">
-          <div id="output" class="out">ここに診断テキストが表示されます。</div>
-        </div>
-
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button id="copy" class="btn secondary">クリップボードにコピー</button>
-          <button id="download" class="btn">結果をダウンロード</button>
-          <button id="clear" class="btn secondary">クリア</button>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:800">クイック操作</div>
-          <div class="small muted">便利ショートカット</div>
-        </div>
-        <div style="margin-top:8px" class="small">
-          <div>• 生年月日を入れると自動で命数が算出されます。</div>
-          <div>• グループ診断は2人以上で実行してください。</div>
-          <div>• 出力は画面で編集してからお渡しください。</div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div style="font-weight:800">バージョン情報</div>
-        <div class="muted" style="margin-top:6px">運命の六属性 診断ツール — 完成版（2025-12-12）</div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- group panel (below main grid) -->
-  <section id="groupPanel" class="card" style="margin-top:18px;display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:800">グループ診断モード</div>
-      <div class="small muted">2人以上で有効</div>
-    </div>
-
-    <div style="margin-top:10px" class="row">
-      <input id="memberName" placeholder="名前（省略可）" />
-      <input id="memberBirth" type="date" />
-      <select id="memberAttribute">
-        <option value="">属性（任意）</option>
-        <option value="fire">火</option><option value="water">水</option>
-        <option value="wind">風</option><option value="sky">空</option>
-        <option value="light">光</option><option value="dark">闇</option>
-      </select>
-      <select id="memberHand">
-        <option value="">手相</option>
-        <option value="masuke">マスカケ</option><option value="support">支援型</option>
-        <option value="free">自由型</option><option value="leader">統率型</option>
-        <option value="talk">対話型</option><option value="late">晩成型</option>
-      </select>
-    </div>
-
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button id="addMember" class="btn secondary">メンバー追加</button>
-      <button id="runGroup" class="btn">グループ診断を実行</button>
-      <button id="exitGroup" class="btn secondary">終了</button>
-    </div>
-
-    <div style="margin-top:12px" class="members-list" id="members"></div>
-  </section>
-</main>
-
-<footer>
-  <div class="muted">注意：このツールは占い補助ツールです。医療行為の代替ではありません。機密情報は保存しないでください。</div>
-</footer>
+<div class="container">
+<h1>運命の六属性診断</h1>
+<small>内部ツール／客提示は結果のみ</small>
+<div id="out"></div>
+</div>
 
 <script>
-/* ========= データローディング（data/*.json を期待） ========= */
-const DATA = {
-  flattype_traits:{},
-  story:{},
-  compatibility:{},
-  group:{},
-  meta:{}
+async function j(p){return fetch(p).then(r=>r.json())}
+
+(async()=>{
+/* 占い師入力 */
+const person={
+ name:"江原 啓介",
+ birth:"1983-01-28",
+ meisuu:53,
+ palm:"晩成型"
 };
 
-async function loadData() {
-  const list = [
-    'data/flattype_traits.json',
-    'data/story.json',
-    'data/compatibility.json',
-    'data/group.json',
-    'data/meta.json'
-  ];
-  for(const p of list){
-    try{
-      const res = await fetch(p);
-      if(res.ok){
-        const j = await res.json();
-        if(p.includes('flattype')) DATA.flattype_traits = j;
-        if(p.includes('story')) DATA.story = j;
-        if(p.includes('compatibility')) DATA.compatibility = j;
-        if(p.includes('group')) DATA.group = j;
-        if(p.includes('meta')) DATA.meta = j;
-      } else {
-        console.info('data not found:',p);
-      }
-    }catch(e){
-      console.info('load failed',p,e);
-    }
-  }
-}
-loadData();
+/* JSON読込 */
+const traits=await j("data/flattype_traits.json");
+const story=await j("data/story.json");
+const num=await j("data/numerology.json");
+const palm=await j("data/palmistry.json");
+const comp=await j("data/compatibility.json");
+const nameJ=await j("data/name_judge.json");
 
-/* ========= util: 命数計算（堅牢簡易版） ========= */
-function calcLifeNumFromDate(dateStr){
-  if(!dateStr) return null;
-  // YYYY-MM-DD -> sum digits -> reduce to 1..60 deterministically
-  const digits = dateStr.replace(/-/g,'').split('').map(d=>parseInt(d,10)||0);
-  let s = digits.reduce((a,b)=>a+b,0);
-  // cross-sum until <= 60
-  while(s > 60) {
-    s = s.toString().split('').map(n=>parseInt(n,10)).reduce((a,b)=>a+b,0);
-  }
-  if(s <= 0) s = 1;
-  return s;
-}
+/* 合成 */
+const t=traits[person.meisuu];
+const s=story[person.meisuu];
+const n=num[person.meisuu];
+const p=palm[person.palm];
+const nj=nameJ.sample;
 
-/* ========= 出力組立ロジック ========= */
-function getTraitText(lifenum){
-  const key = lifenum ? `num${lifenum}` : null;
-  if(key && DATA.flattype_traits[key]) {
-    return DATA.flattype_traits[key].text || DATA.flattype_traits[key].short || '';
-  }
-  // fallback auto generate basic line
-  return lifenum ? `命数${lifenum}の基本傾向（自動生成）` : '命数未指定の傾向';
-}
+/* 出力 */
+out.innerHTML=`
+<div class="card">
+<h2>${person.name} さんの診断</h2>
+<small>生年月日：${person.birth} ／ 命数 ${person.meisuu}</small>
 
-function getStoryText(lifenum, hand){
-  const key = lifenum ? `num${lifenum}` : null;
-  if(key && DATA.story[key]) {
-    // prefer hand-specific intro if exists
-    if(hand && DATA.story[key].hand && DATA.story[key].hand[hand]) {
-      return DATA.story[key].hand[hand];
-    }
-    return DATA.story[key].text || DATA.story[key].intro || '';
-  }
-  return '過去の傾向（自動補完）';
-}
+<h3>■ 性格・本質</h3>
+<p>${t.core}<br>
+命数${person.meisuu}（${n.zodiac}・${n.metal}）：
+${n.summary}</p>
 
-function assembleIndividual({name,birth,attribute,hand,action}){
-  const lifenum = calcLifeNumFromDate(birth);
-  const lines = [];
-  lines.push(`${name || 'お客様'} さんの診断`);
-  if(birth) lines.push(`生年月日: ${birth}（命数 ${lifenum}）`);
-  if(attribute) lines.push(`属性: ${attribute}`);
-  if(hand) lines.push(`手相: ${hand}`);
-  if(action) lines.push(`行動タイプ（目安）: ${action}`);
-  lines.push('');
-  lines.push('■ 性格・傾向');
-  lines.push(getTraitText(lifenum));
-  lines.push('');
-  lines.push('■ 過去・育ちの傾向');
-  lines.push(getStoryText(lifenum, hand));
-  lines.push('');
-  lines.push('■ 相性ワンポイント（抜粋）');
-  // show top 2 compatible attributes if available
-  if(DATA.compatibility && DATA.compatibility.pair_example) {
-    lines.push(DATA.compatibility.pair_example);
-  } else {
-    lines.push('対人は「距離感の調整」が鍵です。');
-  }
-  lines.push('');
-  lines.push('■ ワンポイント助言');
-  lines.push('小さな行動を増やすこと。無理はしない。');
-  return lines.join('\n');
-}
+<h3>■ 過去・育ちの傾向</h3>
+<p>${s.past}<br>${p.note}</p>
 
-/* ========= UI handlers ========= */
-function showOutput(text){
-  document.getElementById('output').textContent = text;
-}
+<h3>■ 行動傾向</h3>
+<p>${t.action}<br>${p.trait}</p>
 
-document.getElementById('runIndividual').addEventListener('click', ()=>{
-  const name = document.getElementById('name').value || '';
-  const birth = document.getElementById('birth').value || '';
-  const attribute = document.getElementById('attribute').value || '';
-  const hand = document.getElementById('hand').value || '';
-  const action = document.getElementById('action').value || '';
-  const txt = assembleIndividual({name,birth,attribute,hand,action});
-  showOutput(txt);
-});
+<h3>■ 相性ワンポイント</h3>
+<p>${comp.summary}<br>${comp.warning}</p>
 
-/* copy / download / clear */
-document.getElementById('copy').addEventListener('click', async ()=>{
-  const txt = document.getElementById('output').textContent;
-  try { await navigator.clipboard.writeText(txt); alert('コピーしました（占い用テキスト）'); }
-  catch(e){ alert('コピーできません。ブラウザの許可を確認してください。'); }
-});
-document.getElementById('download').addEventListener('click', ()=>{
-  const txt = document.getElementById('output').textContent;
-  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'diagnosis.txt';
-  a.click();
-});
-document.getElementById('clear').addEventListener('click', ()=> showOutput('ここに診断テキストが表示されます。'));
+<h3>■ 姓名判断補正</h3>
+<p>${nj.pattern}<br>${nj.note}</p>
 
-/* ========= group mode ========= */
-const members = [];
-function renderMembers(){
-  const box = document.getElementById('members');
-  box.innerHTML = '';
-  members.forEach((m,idx)=>{
-    const div = document.createElement('div');
-    div.innerHTML = `<div><strong>${m.name || ('メンバー'+(idx+1))}</strong> <div class="small">${m.birth || ''} ${m.attribute||''} ${m.hand||''}</div></div>
-                     <div><button data-idx="${idx}" class="btn secondary remove">削除</button></div>`;
-    box.appendChild(div);
-  });
-  box.querySelectorAll('.remove').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const i = parseInt(btn.dataset.idx,10);
-      members.splice(i,1); renderMembers();
-    });
-  });
-}
-document.getElementById('runGroupMode').addEventListener('click', ()=> {
-  document.getElementById('groupPanel').style.display = 'block';
-});
-document.getElementById('addMember').addEventListener('click', ()=>{
-  const name = document.getElementById('memberName').value || '';
-  const birth = document.getElementById('memberBirth').value || '';
-  const attribute = document.getElementById('memberAttribute').value || '';
-  const hand = document.getElementById('memberHand').value || '';
-  const lifenum = calcLifeNumFromDate(birth);
-  members.push({name,birth,attribute,hand,lifenum});
-  renderMembers();
-  document.getElementById('memberName').value=''; document.getElementById('memberBirth').value='';
-});
-document.getElementById('runGroup').addEventListener('click', ()=>{
-  if(members.length < 2){ alert('メンバーを2名以上追加してください'); return; }
-  const report = createGroupReport(members);
-  showOutput(report);
-});
-document.getElementById('exitGroup').addEventListener('click', ()=>{
-  members.splice(0,members.length); renderMembers(); document.getElementById('groupPanel').style.display='none';
-});
-
-function createGroupReport(list){
-  const lines = [];
-  lines.push('グループ診断 — 簡易レポート');
-  lines.push(`人数: ${list.length}`);
-  lines.push('');
-  list.forEach((m,idx)=>{
-    lines.push(`--- ${m.name || ('メンバー'+(idx+1))} ---`);
-    lines.push(`命数: ${m.lifenum || '未指定'}  属性: ${m.attribute || '未指定'}  手相: ${m.hand || '未指定'}`);
-    lines.push(getTraitText(m.lifenum));
-    lines.push('');
-  });
-  // attribute balance
-  const balance = list.reduce((acc,m)=>{
-    if(m.attribute) acc[m.attribute] = (acc[m.attribute]||0)+1;
-    return acc;
-  },{});
-  lines.push('全体属性バランス: '+JSON.stringify(balance));
-  // recommend central person
-  const central = list[0].name || 'メンバー1';
-  lines.push(`推奨：${central}が中心となり、発言の場を作ると安定します。`);
-  return lines.join('\n');
-}
-
-/* initial render */
-renderMembers();
+<h3>■ ワンポイント助言</h3>
+<p>${t.advice}</p>
+</div>`;
+})();
 </script>
 </body>
 </html>
