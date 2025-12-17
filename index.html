@@ -7,170 +7,124 @@
 
 <style>
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial;
-  background:#f6f6f6;
+  font-family:sans-serif;
+  background:#fff;
   margin:0;
+}
+header{
+  padding:16px;
+  border-bottom:1px solid #eee;
+}
+.container{
+  max-width:900px;
+  margin:auto;
   padding:24px;
 }
-header{margin-bottom:24px}
-h1{margin:0}
-small{color:#666}
-
 .card{
-  background:#fff;
+  border:1px solid #ddd;
   border-radius:16px;
-  padding:20px;
-  margin-bottom:20px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.06);
-}
-label{display:block;margin-top:12px}
-input{
-  width:100%;
-  padding:10px;
-  font-size:16px;
-  margin-top:4px;
+  padding:16px;
+  margin-bottom:16px;
 }
 button{
-  margin-top:20px;
-  padding:12px 30px;
-  border-radius:999px;
-  border:none;
-  background:#111;
-  color:#fff;
-  font-size:16px;
+  padding:10px 16px;
+  border-radius:20px;
+  border:1px solid #aaa;
   cursor:pointer;
 }
-button:hover{opacity:.9}
-#error{color:#b00020;margin-top:12px}
+.run{
+  background:#222;
+  color:#fff;
+  border:none;
+}
+small{color:#666;}
+input, select{
+  padding:8px;
+  width:100%;
+  box-sizing:border-box;
+  margin-top:6px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>🔮 運命の六属性診断</h1>
-  <small>内部用 完全版</small>
+<h2>🔮 運命の六属性診断（内部用）</h2>
+<small>※命数は誤差防止のため手入力方式</small>
 </header>
 
+<div class="container">
+
+<!-- 入力カード -->
 <div class="card">
-  <label>名前
-    <input id="name">
-  </label>
-  <label>生年月日
-    <input id="birth" type="date">
-  </label>
-  <button onclick="diagnose()">診断する</button>
-  <div id="error"></div>
+  <label>名前</label>
+  <input id="name">
+
+  <label style="margin-top:16px;">生年月日</label>
+  <input id="birth" type="date">
+
+  <label style="margin-top:16px;">命数（1〜60）※手入力</label>
+  <input id="meisuu" type="number" min="1" max="60">
+
+  <button class="run" style="margin-top:16px;" onclick="analyze()">診断する</button>
 </div>
 
+<!-- 結果表示 -->
 <div id="result"></div>
 
+</div>
+
 <script>
-/* =====================
- 命数計算（公式）
-===================== */
-function calcMeisuu(date){
-  const d = new Date(date);
-  let s = '' + d.getFullYear() + (d.getMonth()+1) + d.getDate();
-  let n = [...s].reduce((a,b)=>a+Number(b),0);
-  while(n > 60){
-    n = [...String(n)].reduce((a,b)=>a+Number(b),0);
+// ----------------------
+// JSON を安全に読み込む関数
+// ----------------------
+async function safeFetch(path){
+  try{
+    const r = await fetch(path);
+    if(!r.ok) throw new Error();
+    return await r.json();
+  }catch(e){
+    // JSON が無くても動く安全対策
+    return {};
   }
-  return n === 0 ? 60 : n;
 }
 
-/* =====================
- 命数データ 1〜60 完全
-===================== */
-const DATA = {
-1:{c:"導星座(金)",k:"スタート",p:"先頭に立つ開拓者。",b:"直感即行動。",d:"始まりを担う"},
-2:{c:"導星座(金)",k:"協調",p:"調整役の才能。",b:"周囲配慮型。",d:"人を繋ぐ"},
-3:{c:"導星座(金)",k:"創造",p:"発想豊かで明るい。",b:"好奇心行動。",d:"才能開花"},
-4:{c:"導星座(金)",k:"基盤",p:"堅実で誠実。",b:"計画重視。",d:"土台構築"},
-5:{c:"導星座(金)",k:"自由",p:"変化対応力。",b:"枠を越える。",d:"流れ変革"},
-6:{c:"導星座(銀)",k:"保護",p:"面倒見が良い。",b:"家族優先。",d:"育成役"},
-7:{c:"導星座(銀)",k:"探究",p:"本質追求。",b:"単独集中。",d:"真理探究"},
-8:{c:"導星座(銀)",k:"成果",p:"成功志向。",b:"責任遂行。",d:"社会達成"},
-9:{c:"導星座(銀)",k:"慈愛",p:"精神性高い。",b:"共感行動。",d:"奉仕"},
-10:{c:"導星座(銀)",k:"再始動",p:"切替上手。",b:"執着しない。",d:"再生"},
+// ----------------------
+// メイン診断処理
+// ----------------------
+async function analyze(){
+  const name  = document.getElementById("name").value.trim() || "未入力";
+  const birth = document.getElementById("birth").value.trim() || "未入力";
+  const meisuu = Number(document.getElementById("meisuu").value);
 
-11:{c:"精霊座(金)",k:"感性",p:"直感鋭い。",b:"波あり。",d:"影響力"},
-12:{c:"精霊座(金)",k:"奉仕",p:"尽くす人。",b:"合わせ型。",d:"成長"},
-13:{c:"精霊座(金)",k:"改革",p:"革新者。",b:"改善行動。",d:"変革"},
-14:{c:"精霊座(金)",k:"適応",p:"柔軟。",b:"多動型。",d:"展開"},
-15:{c:"精霊座(金)",k:"魅力",p:"惹きつける。",b:"中心役。",d:"統合"},
-16:{c:"精霊座(銀)",k:"内省",p:"内面重視。",b:"慎重。",d:"整理"},
-17:{c:"精霊座(銀)",k:"自立",p:"芯が強い。",b:"信念行動。",d:"確立"},
-18:{c:"精霊座(銀)",k:"揺れ",p:"波動型。",b:"感情起伏。",d:"学び"},
-19:{c:"精霊座(銀)",k:"表現",p:"目立つ役。",b:"前面型。",d:"開花"},
-20:{c:"精霊座(銀)",k:"静寂",p:"争い回避。",b:"慎重型。",d:"安定"},
+  if(!meisuu || meisuu < 1 || meisuu > 60){
+    alert("命数を 1〜60 で入力してください");
+    return;
+  }
 
-21:{c:"天命座(金)",k:"完成",p:"まとめ役。",b:"責任集中。",d:"成功"},
-22:{c:"天命座(金)",k:"創造",p:"具現力。",b:"努力型。",d:"構築"},
-23:{c:"天命座(金)",k:"交流",p:"社交性。",b:"活発。",d:"拡大"},
-24:{c:"天命座(金)",k:"愛",p:"守られる。",b:"調和型。",d:"支援"},
-25:{c:"天命座(金)",k:"知恵",p:"学習力。",b:"分析型。",d:"伝達"},
-26:{c:"天命座(銀)",k:"試練",p:"忍耐強い。",b:"葛藤超越。",d:"成就"},
-27:{c:"天命座(銀)",k:"情熱",p:"極端型。",b:"集中爆発。",d:"変化"},
-28:{c:"天命座(銀)",k:"浮沈",p:"差が大。",b:"急決断。",d:"再生"},
-29:{c:"天命座(銀)",k:"直感",p:"導かれる。",b:"大胆。",d:"転換"},
-30:{c:"天命座(銀)",k:"表現",p:"創作向き。",b:"感情豊。",d:"成功"},
+  // JSON を読み込み（存在しない場合は空で継続）
+  const traits = await safeFetch("data/flattype_traits.json");
+  const story  = await safeFetch("data/story.json");
 
-31:{c:"時空座(金)",k:"継続",p:"積上型。",b:"堅実。",d:"安定"},
-32:{c:"時空座(金)",k:"機会",p:"運が強い。",b:"積極。",d:"展開"},
-33:{c:"時空座(金)",k:"守護",p:"癒し系。",b:"調和。",d:"保護"},
-34:{c:"時空座(金)",k:"突破",p:"挑戦者。",b:"限界越え。",d:"成功"},
-35:{c:"時空座(金)",k:"拡大",p:"成長志向。",b:"学習型。",d:"発展"},
-36:{c:"時空座(銀)",k:"転機",p:"変化多。",b:"前進。",d:"切替"},
-37:{c:"時空座(銀)",k:"自立",p:"意志強。",b:"単独。",d:"独立"},
-38:{c:"時空座(銀)",k:"優和",p:"優しい。",b:"気遣い。",d:"支援"},
-39:{c:"時空座(銀)",k:"完遂",p:"やり切る。",b:"粘り。",d:"転換"},
-40:{c:"時空座(銀)",k:"節目",p:"整理型。",b:"区切る。",d:"変化"},
+  const key = String(meisuu);
 
-41:{c:"変容座(金)",k:"再生",p:"逆境強。",b:"変身型。",d:"復活"},
-42:{c:"変容座(金)",k:"改善",p:"修正力。",b:"細部型。",d:"発展"},
-43:{c:"変容座(金)",k:"深化",p:"専門性。",b:"探究。",d:"成果"},
-44:{c:"変容座(金)",k:"統率",p:"カリスマ。",b:"責任。",d:"支配"},
-45:{c:"変容座(金)",k:"伝達",p:"発信力。",b:"行動早。",d:"媒介"},
-46:{c:"変容座(銀)",k:"解放",p:"手放す。",b:"切替。",d:"前進"},
-47:{c:"変容座(銀)",k:"調律",p:"均衡型。",b:"穏健。",d:"安定"},
-48:{c:"変容座(銀)",k:"融合",p:"統合力。",b:"多視点。",d:"橋渡"},
-49:{c:"変容座(銀)",k:"節制",p:"規律型。",b:"抑制。",d:"安定"},
-50:{c:"変容座(銀)",k:"完成",p:"まとめ役。",b:"完遂。",d:"集大成"},
+  const t = traits[key] || {};
+  const s = story[key]  || {};
 
-51:{c:"叡智座(金)",k:"判断",p:"知性高。",b:"合理的。",d:"導き"},
-52:{c:"叡智座(金)",k:"洞察",p:"精神性。",b:"裏読む。",d:"学び"},
-53:{c:"叡智座(金)",k:"守護",p:"導く力。",b:"助言。",d:"影響"},
-54:{c:"叡智座(金)",k:"中心",p:"安定核。",b:"支柱。",d:"要"},
-55:{c:"叡智座(金)",k:"未来",p:"発展性。",b:"前進。",d:"創造"},
-56:{c:"叡智座(銀)",k:"整理",p:"整える。",b:"手放し。",d:"区切"},
-57:{c:"叡智座(銀)",k:"内省",p:"静観型。",b:"慎重。",d:"成長"},
-58:{c:"叡智座(銀)",k:"決断",p:"選択者。",b:"冷静。",d:"分岐"},
-59:{c:"叡智座(銀)",k:"浄化",p:"刷新力。",b:"受容。",d:"再始"},
-60:{c:"叡智座(銀)",k:"結実",p:"成熟。",b:"包容。",d:"集成"}
-};
-
-/* =====================
- 実行
-===================== */
-function diagnose(){
-  const n = name.value.trim();
-  const b = birth.value;
-  const e = error;
-  e.textContent = "";
-  if(!n||!b){e.textContent="未入力があります";return;}
-  const m = calcMeisuu(b);
-  const d = DATA[m];
-  result.innerHTML = `
+  document.getElementById("result").innerHTML = `
     <div class="card">
-      <h3>${n} さん</h3>
-      <p><b>命数：</b>${m}</p>
-      <p><b>星座：</b>${d.c}</p>
-      <p><b>キーワード：</b>${d.k}</p>
-      <h4>性格</h4><p>${d.p}</p>
-      <h4>行動</h4><p>${d.b}</p>
-      <h4>運命</h4><p>${d.d}</p>
-    </div>`;
+      <h3>${name} さん</h3>
+      <p><b>生年月日：</b>${birth}</p>
+      <p><b>命数：</b>${meisuu}</p>
+
+      <h4>■ 性格・傾向</h4>
+      <p>${t.core || "（データ未設定）"}</p>
+
+      <h4>■ 過去ストーリー</h4>
+      <p>${s.past || "（データ未設定）"}</p>
+    </div>
+  `;
 }
 </script>
 
