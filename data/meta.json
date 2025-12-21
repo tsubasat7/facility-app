@@ -1,71 +1,109 @@
 {
-  "version": "1.0",
-  "description": "運命の六属性診断アプリ：全体メタデータ",
-  "structure": {
-    "attributes": ["火", "水", "風", "空", "光", "闇"],
-    "命数範囲": "1-60",
-    "守護星座12分類": [
-      "導星座(金)", "導星座(銀)",
-      "精霊座(金)", "精霊座(銀)",
-      "天命座(金)", "天命座(銀)",
-      "時空座(金)", "時空座(銀)",
-      "変容座(金)", "変容座(銀)",
-      "叡智座(金)", "叡智座(銀)"
-    ],
-    "行動タイプ分類": [
-      "支援型", "自由型", "統率型", "対話型", "晩成型", "マスカケ", "芸術型", "人気型"
-    ]
-  },
-
-  "pair_example": {
-    "属性×命数": {
-      "例1": {
-        "attribute": "火",
-        "meisuu": 12,
-        "summary": "行動力と瞬発力が強く、直感で物事を動かすタイプ。精霊座(金)のため創造力と守護の気質を併せ持つ。"
-      },
-      "例2": {
-        "attribute": "水",
-        "meisuu": 38,
-        "summary": "情緒が深く観察力に優れ、時空座(銀)のため調整力と洞察が強い。"
-      }
+  "導星座": {
+    "range": "1-10",
+    "gold": {
+      "basic_trait": "道を切り開く先導者。直感と行動力で周囲を引っ張る。",
+      "gold_trait": "自己主張が強く、先頭に立って物事を決める傾向。",
+      "life_theme": "新しい道を創る・自分の意思で選択する",
+      "compat_keys": ["lead", "initiative", "fire"],
+      "story_hook": "幼少期から『最初の一歩』を任されやすい。"
     },
-
-    "属性×行動タイプ": {
-      "例1": {
-        "attribute": "風",
-        "action_type": "自由型",
-        "summary": "縛られない発想とスピード感。直感的で枠を越える提案を得意とする。"
-      },
-      "例2": {
-        "attribute": "闇",
-        "action_type": "統率型",
-        "summary": "状況を読む力が鋭く、影のリーダーとして采配をふるう。"
-      }
-    },
-
-    "命数×行動タイプ": {
-      "例1": {
-        "meisuu": 25,
-        "action_type": "支援型",
-        "summary": "天命座(金)の包容力を活かし、周囲を支えながら導くタイプ。"
-      }
+    "silver": {
+      "basic_trait": "人の流れを読みながら最適な方向へ導く柔軟型リーダー。",
+      "silver_trait": "協調性が高く、他者の気持ちを察して動く。",
+      "life_theme": "調和しながら道を整える",
+      "compat_keys": ["flow", "balance", "water"],
+      "story_hook": "周囲の空気を読み、柔らかく場を整えてきた経験。"
     }
   },
 
-  "template_blocks": {
-    "傾向分析": "{attribute} の性質と {meisuu_group} の組み合わせにより、あなたは {core_trait} の傾向を持っています。",
-    "運命診断": "過去から続く流れは {past_flow} にあり、現在の運命は {current_destiny} が中心。守護星座は {guardian}。",
-    "行動タイプ": "あなたの行動タイプは {action_type}。特徴は {action_trait}。",
-    "相性補正": "相手との関係では {relation_pattern} が作用し、補正スコアは {score}。",
-    "過去ストーリー": "幼少期の頃、あなたは {child_event} を経験し、それが現在の {personality_link} につながっています。"
+  "精霊座": {
+    "range": "11-20",
+    "gold": {
+      "basic_trait": "感性が鋭く、ひらめきと表現に優れる。",
+      "gold_trait": "直観的に物事を理解し、創造・表現に積極的。",
+      "life_theme": "感性の解放・創造性の開花",
+      "compat_keys": ["art", "intuition", "light"],
+      "story_hook": "幼少期から独自の感性が光る瞬間がある。"
+    },
+    "silver": {
+      "basic_trait": "人の感情を深く理解し、寄り添う能力が高い。",
+      "silver_trait": "受容力と共感性が高く、癒し手の気質。",
+      "life_theme": "感情の理解と調和",
+      "compat_keys": ["empathy", "healing", "water"],
+      "story_hook": "他人の気持ちを敏感に察知してきた経験。"
+    }
   },
 
-  "mapping_keys": {
-    "attribute": "六属性（火・水・風・空・光・闇）",
-    "meisuu_group": "命数1〜60を5刻みで12分類したグループ",
-    "action_type": "行動タイプ（支援・自由・統率など）",
-    "family_position": "家族構造（父・母・長男・長女など）",
-    "relation": "相性の関係性（親子・夫婦・友人など）"
+  "天命座": {
+    "range": "21-30",
+    "gold": {
+      "basic_trait": "道徳性・使命感が強く、責務を背負う星。",
+      "gold_trait": "正義感と責任感が強く、リーダー役を任される。",
+      "life_theme": "使命を果たす・組織を動かす",
+      "compat_keys": ["duty", "structure", "earth"],
+      "story_hook": "人のために動く役割が自然と回ってきた幼少期。"
+    },
+    "silver": {
+      "basic_trait": "柔らかい使命感を持ち、人の成長を支えるタイプ。",
+      "silver_trait": "サポート力が高く、縁の下の力持ち。",
+      "life_theme": "支援・調整・奉仕",
+      "compat_keys": ["support", "care", "water"],
+      "story_hook": "誰かの裏側を支える役割を担ってきた経験。"
+    }
+  },
+
+  "時空座": {
+    "range": "31-40",
+    "gold": {
+      "basic_trait": "広い視野と客観性を持ち、時間感覚が独特。",
+      "gold_trait": "冷静で戦略的。長期視点で動く。",
+      "life_theme": "未来を見る・俯瞰的判断",
+      "compat_keys": ["vision", "logic", "air"],
+      "story_hook": "周囲より一歩引いて物事を見ていた幼少期。"
+    },
+    "silver": {
+      "basic_trait": "感覚的・非言語的な理解が得意で、繊細。",
+      "silver_trait": "情緒が豊かで、波長に合わせて動くタイプ。",
+      "life_theme": "感情の流れと時間の調和",
+      "compat_keys": ["emotion", "flow", "water"],
+      "story_hook": "場の“空気の揺れ”を敏感に感じていた経験。"
+    }
+  },
+
+  "変容座": {
+    "range": "41-50",
+    "gold": {
+      "basic_trait": "変化・転換に強く、人生の節目で大きく成長する星。",
+      "gold_trait": "大胆に変化を選び、最短距離で突破する。",
+      "life_theme": "破壊と再生・変革",
+      "compat_keys": ["change", "force", "fire"],
+      "story_hook": "人生で何度か大きな“切り替え”を経験しやすい。"
+    },
+    "silver": {
+      "basic_trait": "柔らかな変容。周囲に合わせながら形を変える。",
+      "silver_trait": "適応力が高く、環境により性質が変わる。",
+      "life_theme": "流れに沿った変化・調整型変容",
+      "compat_keys": ["adapt", "blend", "water"],
+      "story_hook": "環境に合わせて自分を変えてきた経験。"
+    }
+  },
+
+  "叡智座": {
+    "range": "51-60",
+    "gold": {
+      "basic_trait": "智慧を司り、客観的・分析的な理解に優れる。",
+      "gold_trait": "理論構築・分析・判断の精度が高い。",
+      "life_theme": "真理の探究・知性の深化",
+      "compat_keys": ["knowledge", "logic", "air"],
+      "story_hook": "幼い頃から“年齢以上の理解力”を周囲に驚かれた。"
+    },
+    "silver": {
+      "basic_trait": "感性の智慧。言葉にしづらい形で真理を理解するタイプ。",
+      "silver_trait": "直感的洞察が深く、霊的な理解を持ちやすい。",
+      "life_theme": "感覚の叡智・精神性の深化",
+      "compat_keys": ["intuition", "mystic", "light"],
+      "story_hook": "人の心の裏側を自然に見抜いた経験。"
+    }
   }
 }

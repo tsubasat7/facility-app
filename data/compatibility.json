@@ -1,139 +1,113 @@
 {
-  "meta": {
-    "version": "1.0",
-    "description": "六属性 × 命数 × 行動型 × 家族構造補正の相性テンプレート",
-    "last_update": "2025-12-12"
+  "version": "1.0",
+  "description": "六属性診断アプリ・相性テンプレ総合管理ファイル",
+
+  "base_relation": {
+    "lover": "恋愛・パートナー",
+    "marriage": "夫婦",
+    "parent_child": "親子",
+    "siblings": "兄弟姉妹",
+    "friends": "友人",
+    "work": "職場",
+    "teacher_student": "指導・教育",
+    "other": "一般"
   },
 
-  "attribute_matrix": {
+  "match_level": {
+    "5": "非常に良い相性（長期的に安定しやすい）",
+    "4": "良い相性（理解し合いやすい）",
+    "3": "普通の相性（工夫次第で安定）",
+    "2": "注意が必要（価値観がずれやすい）",
+    "1": "衝突しやすい（歩み寄りが必須）"
+  },
+
+  "attribute_pair": {
     "fire": {
-      "fire": 0,
-      "water": -2,
-      "wind": +1,
-      "earth": +2,
-      "light": +1,
-      "dark": -1
+      "fire": { "level": 3, "comment": "似た者同士だが競争心がぶつかることも。" },
+      "water": { "level": 2, "comment": "情緒と行動がぶつかりやすいが補完関係にもなる。" },
+      "wind":  { "level": 4, "comment": "火と風は相性が良く、行動が加速する。" },
+      "earth": { "level": 2, "comment": "地の安定感が火を抑えすぎると摩擦に。" },
+      "light": { "level": 5, "comment": "価値観が近く、協力性が高い組み合わせ。" },
+      "shadow":{ "level": 1, "comment": "方向性が逆で、誤解が溜まりやすい。" }
     },
+
     "water": {
-      "fire": -2,
-      "water": 0,
-      "wind": -1,
-      "earth": +1,
-      "light": +2,
-      "dark": 0
+      "fire": { "level": 2, "comment": "水の感情と火の行動力に温度差が出やすい。" },
+      "water":{ "level": 4, "comment": "深い理解で支え合う関係。" },
+      "wind": { "level": 3, "comment": "風が水を動かし、変化を生む。" },
+      "earth":{ "level": 5, "comment": "水と地は最高相性。安定と成長が成立する。" },
+      "light":{ "level": 4, "comment": "光の安心感が水を整える。" },
+      "shadow":{ "level": 2, "comment": "水の揺らぎが闇を刺激しやすい。" }
     },
+
     "wind": {
-      "fire": +1,
-      "water": -1,
-      "wind": 0,
-      "earth": -2,
-      "light": +1,
-      "dark": +2
+      "fire": { "level": 4, "comment": "明るい相性。互いに刺激し合い行動的に。" },
+      "water":{ "level": 3, "comment": "水の調整が風の自由をほどよく整える。" },
+      "wind": { "level": 3, "comment": "自由が重なり、束縛を嫌う関係。" },
+      "earth":{ "level": 2, "comment": "地の重さが風の軽さと衝突しがち。" },
+      "light":{ "level": 4, "comment": "明るく軽快、互いに理解しやすい。" },
+      "shadow":{ "level": 2, "comment": "風が闇の敏感な部分を乱すことがある。" }
     },
+
     "earth": {
-      "fire": +2,
-      "water": +1,
-      "wind": -2,
-      "earth": 0,
-      "light": -1,
-      "dark": +1
+      "fire": { "level": 2, "comment": "堅実と情熱で噛み合わない場面も。" },
+      "water":{ "level": 5, "comment": "水が地を豊かにし最高相性。" },
+      "wind": { "level": 2, "comment": "風の気まぐれに地が不安定になりやすい。" },
+      "earth":{ "level": 4, "comment": "価値観が近く長期的に安定。" },
+      "light":{ "level": 3, "comment": "光が地を優しく導くバランス型。" },
+      "shadow":{ "level": 2, "comment": "地の安定性が闇の繊細さと対立することも。" }
     },
+
     "light": {
-      "fire": +1,
-      "water": +2,
-      "wind": +1,
-      "earth": -1,
-      "light": 0,
-      "dark": -2
+      "fire": { "level": 5, "comment": "行動×安心感の最強ペア。" },
+      "water":{ "level": 4, "comment": "情緒面をしっかり受け止める。" },
+      "wind": { "level": 4, "comment": "気楽で明るく、協力しやすい。" },
+      "earth":{ "level": 3, "comment": "安定感はあるが硬直しがち。" },
+      "light":{ "level": 4, "comment": "明るく調和的な関係。" },
+      "shadow":{ "level": 1, "comment": "価値観が真逆で衝突しやすい。" }
     },
-    "dark": {
-      "fire": -1,
-      "water": 0,
-      "wind": +2,
-      "earth": +1,
-      "light": -2,
-      "dark": 0
+
+    "shadow": {
+      "fire": { "level": 1, "comment": "刺激が強すぎる組み合わせ。" },
+      "water":{ "level": 2, "comment": "お互いの不安を揺さぶりやすい。" },
+      "wind": { "level": 2, "comment": "風の軽さが闇の深さと相容れない。" },
+      "earth":{ "level": 2, "comment": "地の硬さと闇の敏感さが摩擦に。" },
+      "light":{ "level": 1, "comment": "正反対で理解が難しい。" },
+      "shadow":{ "level": 4, "comment": "深い部分で分かちあえる希少な同族性。" }
     }
   },
 
-  "numerology_bonus": {
-    "same_group": +2,
-    "neighbor_group": +1,
-    "far_group": -1,
-    "gold_silver_match": +1,
-    "gold_gold_hard": -1,
-    "silver_silver_soft": +1
+  "meisuu_band": {
+    "1-10":  { "plus": "行動力が噛み合いやすい", "minus": "衝突も早い" },
+    "11-20": { "plus": "感性が一致しやすい", "minus": "情緒面が揺れやすい" },
+    "21-30": { "plus": "責任感で結びつく", "minus": "意地の張り合いに注意" },
+    "31-40": { "plus": "価値観の理解が深い", "minus": "距離感が空きやすい" },
+    "41-50": { "plus": "変化を共に乗り越えられる", "minus": "タイミングずれが発生" },
+    "51-60": { "plus": "精神性が一致する", "minus": "考えすぎて溝ができやすい" }
   },
 
-  "behavior_match": {
-    "support": {
-      "support": +1,
-      "free": +2,
-      "leader": +1,
-      "dialog": +2,
-      "late": 0
+  "relation_adjust": {
+    "parent_child": {
+      "good": "理解されると大きく伸びる関係です。",
+      "bad": "価値観の押しつけが火種になります。"
     },
-    "free": {
-      "support": +2,
-      "free": 0,
-      "leader": -2,
-      "dialog": +1,
-      "late": -1
+    "lover": {
+      "good": "お互いの弱さを補い合う最高のパートナー。",
+      "bad": "気持ちの温度差に注意。"
     },
-    "leader": {
-      "support": +1,
-      "free": -2,
-      "leader": 0,
-      "dialog": -1,
-      "late": +2
-    },
-    "dialog": {
-      "support": +2,
-      "free": +1,
-      "leader": -1,
-      "dialog": 0,
-      "late": +1
-    },
-    "late": {
-      "support": 0,
-      "free": -1,
-      "leader": +2,
-      "dialog": +1,
-      "late": 0
+    "work": {
+      "good": "役割分担が明確だと成果が出やすい。",
+      "bad": "ストレスの抱え込みに注意。"
     }
   },
 
-  "family_role_adjust": {
-    "father_child": -1,
-    "mother_child": +1,
-    "sibling_close_age": +1,
-    "sibling_far_age": 0,
-    "couple": {
-      "ideal_gap_small": +2,
-      "ideal_gap_large": -1
-    }
-  },
-
-  "story_bonus": {
-    "trauma_overlap": +2,
-    "goal_alignment": +3,
-    "growth_conflict": -2
-  },
-
-  "output_template": {
-    "score_range": {
-      "excellent": [8, 99],
-      "good": [3, 7],
-      "neutral": [-2, 2],
-      "bad": [-6, -3],
-      "worst": [-99, -7]
-    },
-    "comment": {
-      "excellent": "非常に良い相性。自然体でいられ、お互いの弱点を補える組み合わせです。",
-      "good": "良好な相性。少し意識するだけで関係がよりスムーズに進みます。",
-      "neutral": "普通の相性。特に良くも悪くもなく、工夫次第で変化します。",
-      "bad": "注意が必要な相性。価値観の違いから摩擦が生まれやすい傾向があります。",
-      "worst": "最も衝突しやすい相性。距離感や役割を丁寧に調整することが大切です。"
-    }
+  "final_sentence_rules": {
+    "join": [
+      "属性相性コメント",
+      "命数帯コメント",
+      "守護星座（金銀）補正",
+      "関係性による最終アドバイス"
+    ],
+    "note": "最終メッセージは app.js 側で結合し生成する。"
   }
 }
