@@ -1,29 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>運命の六属性診断（内部ツール）</title>
+
+<style>
+body{font-family:sans-serif;background:#fafafa;margin:0}
+header{padding:16px;border-bottom:1px solid #ddd;background:#fff}
+.container{max-width:1000px;margin:auto;padding:20px}
+.card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:16px;margin-bottom:20px}
+h3{margin-top:0}
+button{padding:10px 16px;border-radius:20px;border:1px solid #555;cursor:pointer;background:#fff}
+button.run{background:#222;color:#fff;border:none}
+button[disabled]{opacity:0.5;cursor:not-allowed;}
+input,select{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
+.flex{display:flex;gap:20px}
+.member-block{border:1px dashed #aaa;padding:16px;border-radius:12px;margin-bottom:16px;background:#fefefe}
+</style>
+
+</head>
+<body>
+
+<header>
+<h2>🔮 運命の六属性診断（内部ツール）</h2>
+<small>完全版</small>
+</header>
+
+<div class="container">
+
+<!-- 個別診断 -->
+<div class="card">
+<h3>■ 個別診断</h3>
+
+<div class="flex">
+<div style="flex:1">
+<label>名前</label>
+<input id="single_name">
+</div>
+
+<div style="flex:1">
+<label>生年月日（記録用・計算しない）</label>
+<input id="single_birth" type="date">
+</div>
+
+<div style="flex:1">
+<label>命数（1〜60）</label>
+<input id="single_meisuu" type="number" min="1" max="60">
+</div>
+</div>
+
+<br>
+<button class="run" id="btn_single" onclick="analyzeSingle()" disabled>読み込み中…</button>
+</div>
+
+<div id="single_result"></div>
+
+
+
+<!-- 相性診断（2名） -->
+<div class="card">
+<h3>■ 相性診断（2人）</h3>
+
+<div class="flex">
+<div style="flex:1">
+<label>本人の命数</label>
+<input id="pair_a" type="number" min="1" max="60">
+</div>
+
+<div style="flex:1">
+<label>相手の命数</label>
+<input id="pair_b" type="number" min="1" max="60">
+</div>
+</div>
+
+<br>
+<button class="run" id="btn_pair" onclick="analyzePair()" disabled>読み込み中…</button>
+</div>
+
+<div id="pair_result"></div>
+
+
+<!-- グループ診断 -->
+<div class="card">
+<h3>■ グループ診断（複数名）</h3>
+<div id="group_area"></div>
+
+<button id="btn_add" onclick="addMember()" disabled>＋ 人を追加</button>
+<button class="run" id="btn_group" onclick="analyzeGroup()" disabled>読み込み中…</button>
+</div>
+
+<div id="group_result"></div>
+
+</div> <!-- container -->
+
 <script>
 // JSONデータ
 let TRAITS={}, STORY={}, META={}, COMPAT={};
 let loaded = false;
 
-// ロード中はボタン無効化
-function disableButtons(){
-  document.querySelectorAll("button.run").forEach(btn=>{
-    btn.disabled = true;
-    btn.style.opacity = "0.5";
-    btn.textContent = "読み込み中…";
-  });
-}
-function enableButtons(){
-  document.querySelectorAll("button.run").forEach(btn=>{
-    btn.disabled = false;
-    btn.style.opacity = "1";
-    if(btn.innerText.includes("診断")) btn.textContent = "診断する";
-    if(btn.innerText.includes("相性")) btn.textContent = "相性を見る";
-    if(btn.innerText.includes("グループ")) btn.textContent = "グループ診断実行";
-  });
-}
-
-// JSON ロード
+// ------------------------------------------------
+// JSON 読み込み & ボタン有効化
+// ------------------------------------------------
 async function loadAll(){
-  disableButtons();
   try{
     const t = fetch("data/traits.json").then(r=>r.json());
     const s = fetch("data/story.json").then(r=>r.json());
@@ -37,8 +116,21 @@ async function loadAll(){
     META   = M;
     COMPAT = C;
 
+    // すべて読み込み完了
     loaded = true;
-    enableButtons();
+
+    // ボタン有効化
+    document.getElementById("btn_single").disabled = false;
+    document.getElementById("btn_single").textContent = "診断する";
+
+    document.getElementById("btn_pair").disabled = false;
+    document.getElementById("btn_pair").textContent = "相性を見る";
+
+    document.getElementById("btn_group").disabled = false;
+    document.getElementById("btn_group").textContent = "グループ診断実行";
+
+    document.getElementById("btn_add").disabled = false;
+
     console.log("JSON すべて読み込み完了");
 
   }catch(e){
@@ -49,27 +141,24 @@ async function loadAll(){
 loadAll();
 
 
+// ------------------------------------------------
 // ■ 個別診断
+// ------------------------------------------------
 function analyzeSingle(){
-  if(!loaded){ alert("データ読み込み中です…"); return; }
+  if(!loaded){ alert("データ読み込み中です"); return; }
 
   const name   = document.getElementById("single_name").value || "未入力";
   const birth  = document.getElementById("single_birth").value || "未入力";
   const meisuu = Number(document.getElementById("single_meisuu").value);
 
   if(!meisuu || meisuu<1 || meisuu>60){
-    alert("命数は 1〜60 で入力してください");
+    alert("命数は1〜60で入力してください");
     return;
   }
 
   const t = TRAITS[meisuu];
   const s = STORY[meisuu];
   const m = META[meisuu];
-
-  if(!t || !s || !m){
-    alert("データが未登録の命数です");
-    return;
-  }
 
   document.getElementById("single_result").innerHTML = `
     <div class="card">
@@ -88,14 +177,16 @@ function analyzeSingle(){
 }
 
 
+// ------------------------------------------------
 // ■ 2名相性
+// ------------------------------------------------
 function analyzePair(){
-  if(!loaded){ alert("データ読み込み中です…"); return; }
+  if(!loaded){ alert("データ読み込み中です"); return; }
 
   const a = Number(document.getElementById("pair_a").value);
   const b = Number(document.getElementById("pair_b").value);
 
-  if(!a || !b){ alert("命数を入力"); return; }
+  if(!a || !b){ alert("命数を入力してください"); return; }
 
   const key = `${a}-${b}`;
   const val = COMPAT[key] || "相性データなし";
@@ -109,7 +200,9 @@ function analyzePair(){
 }
 
 
+// ------------------------------------------------
 // ■ グループ追加
+// ------------------------------------------------
 function addMember(){
   const area = document.getElementById("group_area");
   const div = document.createElement("div");
@@ -128,12 +221,13 @@ function addMember(){
 }
 
 
+// ------------------------------------------------
 // ■ グループ診断
+// ------------------------------------------------
 function analyzeGroup(){
-  if(!loaded){ alert("データ読み込み中です…"); return; }
+  if(!loaded){ alert("データ読み込み中です"); return; }
 
   const blocks = document.querySelectorAll(".member-block");
-
   if(blocks.length===0){
     alert("人数を追加してください");
     return;
@@ -198,4 +292,8 @@ function analyzeGroup(){
 
   document.getElementById("group_result").innerHTML = html;
 }
+
 </script>
+
+</body>
+</html>
