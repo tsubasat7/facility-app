@@ -51,7 +51,7 @@ input,select{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
 </div>
 
 <br>
-<button class="run" id="btn_single" onclick="analyzeSingle()" disabled>読み込み中…</button>
+<button class="run" id="btn_single" disabled>読み込み中…</button>
 </div>
 
 <div id="single_result"></div>
@@ -75,7 +75,7 @@ input,select{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
 </div>
 
 <br>
-<button class="run" id="btn_pair" onclick="analyzePair()" disabled>読み込み中…</button>
+<button class="run" id="btn_pair" disabled>読み込み中…</button>
 </div>
 
 <div id="pair_result"></div>
@@ -86,8 +86,8 @@ input,select{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
 <h3>■ グループ診断（複数名）</h3>
 <div id="group_area"></div>
 
-<button id="btn_add" onclick="addMember()" disabled>＋ 人を追加</button>
-<button class="run" id="btn_group" onclick="analyzeGroup()" disabled>読み込み中…</button>
+<button id="btn_add" disabled>＋ 人を追加</button>
+<button class="run" id="btn_group" disabled>読み込み中…</button>
 </div>
 
 <div id="group_result"></div>
@@ -96,54 +96,66 @@ input,select{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
 
 <script>
 // JSONデータ
-let TRAITS={}, STORY={}, META={}, COMPAT={};
+let TRAITS={}, FLATTYPE={}, STORY={}, META={}, COMPAT={}, GROUP={};
 let loaded = false;
 
-// ------------------------------------------------
-// JSON 読み込み & ボタン有効化
-// ------------------------------------------------
+// ---------------------------------------------------------
+// JSON読み込み（GitHub Pages でも確実に動作）
+// ---------------------------------------------------------
 async function loadAll(){
   try{
     const t = fetch("data/traits.json").then(r=>r.json());
+    const ft = fetch("data/flattype_traits.json").then(r=>r.json());
     const s = fetch("data/story.json").then(r=>r.json());
     const m = fetch("data/meta.json").then(r=>r.json());
     const c = fetch("data/compatibility.json").then(r=>r.json());
+    const g = fetch("data/group.json").then(r=>r.json());
 
-    const [T,S,M,C] = await Promise.all([t,s,m,c]);
+    const [T,FT,S,M,C,G] = await Promise.all([t,ft,s,m,c,g]);
 
-    TRAITS = T;
-    STORY  = S;
-    META   = M;
-    COMPAT = C;
+    TRAITS   = T;
+    FLATTYPE = FT;
+    STORY    = S;
+    META     = M;
+    COMPAT   = C;
+    GROUP    = G;
 
-    // すべて読み込み完了
     loaded = true;
 
-    // ボタン有効化
-    document.getElementById("btn_single").disabled = false;
-    document.getElementById("btn_single").textContent = "診断する";
+    // ボタン解放
+    enableButtons();
 
-    document.getElementById("btn_pair").disabled = false;
-    document.getElementById("btn_pair").textContent = "相性を見る";
-
-    document.getElementById("btn_group").disabled = false;
-    document.getElementById("btn_group").textContent = "グループ診断実行";
-
-    document.getElementById("btn_add").disabled = false;
-
-    console.log("JSON すべて読み込み完了");
-
+    console.log("🔥 JSON全読み込み完了");
   }catch(e){
     alert("データ読み込みに失敗しました");
     console.error(e);
   }
 }
+
+// ---------------------------------------------------------
+function enableButtons(){
+  document.getElementById("btn_single").disabled = false;
+  document.getElementById("btn_single").textContent = "診断する";
+
+  document.getElementById("btn_pair").disabled = false;
+  document.getElementById("btn_pair").textContent = "相性を見る";
+
+  document.getElementById("btn_group").disabled = false;
+  document.getElementById("btn_group").textContent = "グループ診断実行";
+
+  document.getElementById("btn_add").disabled = false;
+
+  document.getElementById("btn_single").onclick = analyzeSingle;
+  document.getElementById("btn_pair").onclick = analyzePair;
+  document.getElementById("btn_group").onclick = analyzeGroup;
+  document.getElementById("btn_add").onclick = addMember;
+}
+
 loadAll();
 
-
-// ------------------------------------------------
+// ---------------------------------------------------------
 // ■ 個別診断
-// ------------------------------------------------
+// ---------------------------------------------------------
 function analyzeSingle(){
   if(!loaded){ alert("データ読み込み中です"); return; }
 
@@ -156,9 +168,10 @@ function analyzeSingle(){
     return;
   }
 
-  const t = TRAITS[meisuu];
-  const s = STORY[meisuu];
-  const m = META[meisuu];
+  const t  = TRAITS[meisuu];
+  const ft = FLATTYPE[meisuu];
+  const s  = STORY[meisuu];
+  const m  = META[meisuu];
 
   document.getElementById("single_result").innerHTML = `
     <div class="card">
@@ -170,16 +183,18 @@ function analyzeSingle(){
       <h4>■ 性格・核</h4>
       <p>${t.core}</p>
 
+      <h4>■ 行動タイプ</h4>
+      <p>${ft.type}</p>
+
       <h4>■ 過去ストーリー</h4>
       <p>${s.past}</p>
     </div>
   `;
 }
 
-
-// ------------------------------------------------
-// ■ 2名相性
-// ------------------------------------------------
+// ---------------------------------------------------------
+// ■ 相性診断
+// ---------------------------------------------------------
 function analyzePair(){
   if(!loaded){ alert("データ読み込み中です"); return; }
 
@@ -199,10 +214,9 @@ function analyzePair(){
   `;
 }
 
-
-// ------------------------------------------------
-// ■ グループ追加
-// ------------------------------------------------
+// ---------------------------------------------------------
+// ■ グループメンバー追加
+// ---------------------------------------------------------
 function addMember(){
   const area = document.getElementById("group_area");
   const div = document.createElement("div");
@@ -220,10 +234,9 @@ function addMember(){
   area.appendChild(div);
 }
 
-
-// ------------------------------------------------
+// ---------------------------------------------------------
 // ■ グループ診断
-// ------------------------------------------------
+// ---------------------------------------------------------
 function analyzeGroup(){
   if(!loaded){ alert("データ読み込み中です"); return; }
 
@@ -247,6 +260,7 @@ function analyzeGroup(){
       birth,
       meisuu:m,
       trait:TRAITS[m],
+      flat:FLATTYPE[m],
       story:STORY[m],
       meta:META[m]
     });
@@ -265,6 +279,7 @@ function analyzeGroup(){
         命数：${p.meisuu}<br>
         守護星座：${p.meta.zodiac}（${p.meta.type}）<br>
         <b>性格：</b>${p.trait.core}<br>
+        <b>行動タイプ：</b>${p.flat.type}<br>
         <b>過去：</b>${p.story.past}
       </div>
     `;
