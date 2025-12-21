@@ -1,0 +1,162 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "手相分類（マスカケ／支援型／対話型／晩成型／自由線／統率型）による性格・相性・ストーリー補正テンプレート",
+    "last_update": "2025-12-12"
+  },
+
+  "types": {
+    "masukake": {
+      "name": "マスカケ線",
+      "personality": [
+        "強い意志と集中力を持つ",
+        "人生の転換点が大きく出やすい",
+        "ゼロからの再構築力が高い"
+      ],
+      "behavior_bonus": {
+        "leader": +2,
+        "free": +1,
+        "support": 0,
+        "dialog": -1,
+        "late": +1
+      },
+      "story_bonus": {
+        "life_turning_points": +3,
+        "solo_growth": +2,
+        "conflict_in_childhood": +1
+      },
+      "compatibility_adjust": {
+        "with_leaders": +2,
+        "with_sensitive": -1,
+        "with_free": +1
+      }
+    },
+
+    "support": {
+      "name": "支援型",
+      "personality": [
+        "他者理解力が高く、共感的",
+        "環境調整や裏側の管理が得意",
+        "我慢しやすい傾向がある"
+      ],
+      "behavior_bonus": {
+        "support": +2,
+        "free": +1,
+        "leader": -1,
+        "dialog": +2,
+        "late": 0
+      },
+      "story_bonus": {
+        "hidden_struggles": +2,
+        "family_burden": +1,
+        "long_term_effort": +1
+      },
+      "compatibility_adjust": {
+        "with_free": +2,
+        "with_dialog": +2,
+        "with_leaders": -1
+      }
+    },
+
+    "dialog": {
+      "name": "対話型",
+      "personality": [
+        "コミュニケーション能力が高い",
+        "調整力・交渉力が優れる",
+        "人間関係の中心になりやすい"
+      ],
+      "behavior_bonus": {
+        "dialog": +2,
+        "support": +2,
+        "free": +1,
+        "leader": -1,
+        "late": 0
+      },
+      "story_bonus": {
+        "social_growth": +2,
+        "communication_trials": +1
+      },
+      "compatibility_adjust": {
+        "with_support": +2,
+        "with_free": +1,
+        "with_leaders": -2
+      }
+    },
+
+    "late": {
+      "name": "晩成型",
+      "personality": [
+        "成長がゆっくりだが後半で伸びる",
+        "本質を見抜く洞察力を持つ",
+        "一度決めると粘り強い"
+      ],
+      "behavior_bonus": {
+        "late": +2,
+        "leader": +2,
+        "support": 0,
+        "dialog": 0,
+        "free": -1
+      },
+      "story_bonus": {
+        "slow_start": +2,
+        "delayed_success": +3,
+        "inner_conflicts": +1
+      },
+      "compatibility_adjust": {
+        "with_leaders": +2,
+        "with_support": +1
+      }
+    },
+
+    "free": {
+      "name": "自由線",
+      "personality": [
+        "自由を求めるタイプ",
+        "直感で動き、変化への適応力が高い",
+        "行動の幅が広く固定されない"
+      ],
+      "behavior_bonus": {
+        "free": +2,
+        "dialog": +1,
+        "support": +1,
+        "leader": -2,
+        "late": -1
+      },
+      "story_bonus": {
+        "freedom_conflict": +2,
+        "travel_paths": +1,
+        "unexpected_events": +2
+      },
+      "compatibility_adjust": {
+        "with_support": +2,
+        "with_dialog": +1,
+        "with_leaders": -2
+      }
+    },
+
+    "leader": {
+      "name": "統率型",
+      "personality": [
+        "強い責任感とリーダー気質",
+        "目標達成への執着が強い",
+        "組織の中核になりやすい"
+      ],
+      "behavior_bonus": {
+        "leader": +2,
+        "late": +2,
+        "support": +1,
+        "dialog": -1,
+        "free": -2
+      },
+      "story_bonus": {
+        "responsibility_tests": +2,
+        "leadership_trials": +3
+      },
+      "compatibility_adjust": {
+        "with_support": +1,
+        "with_late": +2,
+        "with_free": -2
+      }
+    }
+  }
+}

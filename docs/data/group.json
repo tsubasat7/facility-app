@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "グループ診断テンプレート（最大5名）",
+    "last_update": "2025-12-13"
+  },
+
+  "overall_score_rules": {
+    "excellent": [15, 999],
+    "good": [7, 14],
+    "neutral": [-3, 6],
+    "bad": [-10, -4],
+    "worst": [-999, -11]
+  },
+
+  "group_roles": {
+    "leader": "全体の方向性を決める役。行動速度が速く、他メンバーの判断基準となる。",
+    "support": "全員の負荷を下げる潤滑油。情報整理と橋渡し役。",
+    "dialog": "関係性を繋ぐ中心。衝突を和らげ、意見を翻訳する。",
+    "free": "流れに柔軟性を与える創造型。新しい視点を提供する。",
+    "late": "ゆっくりだが安定型。全体の均衡を保つバランサー。"
+  },
+
+  "group_patterns": {
+    "balanced": {
+      "condition": "leader, support, dialog, free, late が2つ以上被らず散っている",
+      "result": "非常にバランスが良く、自然に役割が分かれる協力型グループ。",
+      "advice": "役割を固定化しすぎず、お互いの強みを共有するとさらに強い。"
+    },
+    "leader_heavy": {
+      "condition": "leaderタイプが2名以上",
+      "result": "推進力は強いが衝突も起きやすい。明確な担当分けが必要。",
+      "advice": "最終決定者を1名に固定することで安定する。"
+    },
+    "support_centered": {
+      "condition": "supportタイプが2名以上",
+      "result": "雰囲気がよく、全員が動きやすい協調型グループ。",
+      "advice": "明確なリーダーがいないと迷いやすいので方向性だけ決めると◎。"
+    },
+    "creative_free": {
+      "condition": "freeタイプが複数",
+      "result": "発想が豊かで流動性のあるチーム。まとまりに欠けることも。",
+      "advice": "締切と担当ラインだけ共有すれば最大の結果が出る。"
+    },
+    "stable_late": {
+      "condition": "lateタイプが複数",
+      "result": "落ち着いていて衝突が少ないが進行が遅れがち。",
+      "advice": "時間計画を明確にし、チェック役を立てると強い。"
+    }
+  },
+
+  "relationship_map": {
+    "very_good": "深い協力関係を築きやすく、自然と役割が噛み合う。",
+    "good": "相性は良好でストレスが少ない。調和しやすい。",
+    "normal": "程よい距離感。意思疎通次第で強い関係に発展。",
+    "bad": "価値観がぶつかりやすい。役割分担で改善可能。",
+    "danger": "衝突が多く、誤解が生まれやすい要注意ペア。"
+  },
+
+  "warnings": {
+    "conflict": "価値観が真逆で衝突しやすい組み合わせ。間に対話型を置くと改善。",
+    "dominant_collision": "リーダー型が複数でぶつかるケース。決定権を明確に。",
+    "energy_gap": "行動速度が違いすぎるとストレス要因に。ペアで動かすと◎。",
+    "free_spread": "freeタイプが多いと方向性が散りやすい。締切を先に決めると良い。"
+  },
+
+  "output_template": {
+    "overall_score": "数値（-20〜+20）",
+    "overall_comment": "グループ全体の相性総評コメント",
+    "pattern": "検出されたグループパターン（balanced / leader_heavy /など）",
+    "roles_summary": "メンバー全員の行動タイプまとめ",
+    "relationship_summary": "全ペアの関係性（very_good〜danger）",
+    "warnings": "注意ポイント",
+    "strengths": "グループの強み",
+    "advice": "改善・成長のための実用アドバイス"
+  }
+}
