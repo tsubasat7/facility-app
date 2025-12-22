@@ -13,309 +13,151 @@ header{padding:16px;border-bottom:1px solid #ddd;background:#fff}
 h3{margin-top:0}
 button{padding:10px 16px;border-radius:20px;border:1px solid #555;cursor:pointer;background:#fff}
 button.run{background:#222;color:#fff;border:none}
-button[disabled]{opacity:0.5;cursor:not-allowed;}
-input,select{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
+button[disabled]{opacity:0.5;cursor:not-allowed}
+input{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
 .flex{display:flex;gap:20px}
 .member-block{border:1px dashed #aaa;padding:16px;border-radius:12px;margin-bottom:16px;background:#fefefe}
 </style>
 </head>
 
 <body>
-
 <header>
 <h2>🔮 運命の六属性診断（内部ツール）</h2>
-<small>完全版 / GitHub Pages 対応</small>
+<small>完全統合版 / GitHub Pages 対応</small>
 </header>
 
 <div class="container">
 
-<!-- 個別診断 -->
 <div class="card">
 <h3>■ 個別診断</h3>
-
 <div class="flex">
-<div style="flex:1">
+<div>
 <label>名前</label>
 <input id="single_name">
 </div>
-
-<div style="flex:1">
-<label>生年月日（記録用）</label>
-<input id="single_birth" type="date">
+<div>
+<label>生年月日</label>
+<input type="date" id="single_birth">
 </div>
-
-<div style="flex:1">
+<div>
 <label>命数（1〜60）</label>
-<input id="single_meisuu" type="number" min="1" max="60">
+<input type="number" id="single_meisuu" min="1" max="60">
 </div>
 </div>
-
 <br>
 <button class="run" id="btn_single" disabled>読み込み中…</button>
 </div>
-
 <div id="single_result"></div>
 
-
-<!-- 相性診断 -->
 <div class="card">
-<h3>■ 相性診断（2人）</h3>
-
+<h3>■ 相性診断</h3>
 <div class="flex">
-<div style="flex:1">
-<label>本人の命数</label>
-<input id="pair_a" type="number" min="1" max="60">
+<div>
+<label>本人命数</label>
+<input type="number" id="pair_a" min="1" max="60">
 </div>
-
-<div style="flex:1">
-<label>相手の命数</label>
-<input id="pair_b" type="number" min="1" max="60">
+<div>
+<label>相手命数</label>
+<input type="number" id="pair_b" min="1" max="60">
 </div>
 </div>
-
 <br>
 <button class="run" id="btn_pair" disabled>読み込み中…</button>
 </div>
-
 <div id="pair_result"></div>
 
-
-<!-- グループ診断 -->
-<div class="card">
-<h3>■ グループ診断（複数名）</h3>
-<div id="group_area"></div>
-
-<button id="btn_add" disabled>＋ 人を追加</button>
-<button class="run" id="btn_group" disabled>読み込み中…</button>
 </div>
 
-<div id="group_result"></div>
-
-</div> <!-- container -->
-
-
 <script>
-// -----------------------------------------------------
-// JSON変数
-// -----------------------------------------------------
-let TRAITS={}, STORY={}, META={}, COMPAT={};
-let FLAT={}, PALM={}, ATTR={}, GROUP={}, MEISUU={}, NUMERO={}, PERSON={};
+/* ===============================
+   グローバルデータ
+================================ */
+let TRAITS={}, STORY={}, META={}, ATTR={}, COMPAT={};
 
-let loaded = false;
-
-// -----------------------------------------------------
-// GitHub Pages でも確実に動く JSON loader
-// -----------------------------------------------------
-async function loadJson(url){
+/* ===============================
+   Safe JSON Loader
+================================ */
+async function safeLoad(url, fallback={}){
   try{
-    const res = await fetch(url, {cache:"no-store"});
-    if(!res.ok) throw new Error(url + " HTTP " + res.status);
+    const res = await fetch(url,{cache:"no-store"});
+    if(!res.ok) throw new Error(res.status);
     return await res.json();
   }catch(e){
-    console.error("JSON読み込み失敗:", url, e);
-    alert("JSON読み込み失敗: " + url);
-    throw e;
+    console.warn("読み込み失敗:",url,e);
+    return fallback;
   }
 }
 
-// -----------------------------------------------------
-// 全 JSON 読み込み（直列）
-// -----------------------------------------------------
-async function loadAll(){
-  try{
-    TRAITS  = await loadJson("data/traits.json");
-    STORY   = await loadJson("data/story.json");
-    META    = await loadJson("data/meta.json");
-    COMPAT  = await loadJson("data/compatibility.json");
+/* ===============================
+   全ロード
+================================ */
+async function init(){
+  TRAITS = await safeLoad("data/traits.json");
+  STORY  = await safeLoad("data/story.json");
+  META   = await safeLoad("data/meta.json");
+  ATTR   = await safeLoad("data/attributes.json");
+  COMPAT = await safeLoad("data/compatibility.json");
 
-    FLAT    = await loadJson("data/flattype_traits.json");
-    PALM    = await loadJson("data/palmistry.json");
-    ATTR    = await loadJson("data/attributes.json");
-    GROUP   = await loadJson("data/group.json");
-    MEISUU  = await loadJson("data/meisuu.json");
-    NUMERO  = await loadJson("data/numerology.json");
-    PERSON  = await loadJson("data/person_template.json");
+  document.getElementById("btn_single").disabled=false;
+  document.getElementById("btn_single").textContent="診断する";
 
-    loaded = true;
+  document.getElementById("btn_pair").disabled=false;
+  document.getElementById("btn_pair").textContent="相性を見る";
 
-    // ボタン解放
-    document.getElementById("btn_single").disabled = false;
-    document.getElementById("btn_single").textContent = "診断する";
+  console.log("初期化完了");
+}
+init();
 
-    document.getElementById("btn_pair").disabled = false;
-    document.getElementById("btn_pair").textContent = "相性を見る";
+/* ===============================
+   個別診断
+================================ */
+document.getElementById("btn_single").onclick=()=>{
+  const name=document.getElementById("single_name").value||"未入力";
+  const birth=document.getElementById("single_birth").value||"";
+  const m=Number(document.getElementById("single_meisuu").value);
+  if(!m||m<1||m>60){alert("命数エラー");return;}
 
-    document.getElementById("btn_group").disabled = false;
-    document.getElementById("btn_group").textContent = "グループ診断実行";
+  const t=TRAITS[m]?.core||"未定義";
+  const s=STORY[m]?.past||"未定義";
+  const meta=META[m]||{zodiac:"不明",type:""};
 
-    document.getElementById("btn_add").disabled = false;
+  document.getElementById("single_result").innerHTML=`
+  <div class="card">
+    <h3>${name}</h3>
+    <p>命数：${m}</p>
+    <p>守護星座：${meta.zodiac} ${meta.type}</p>
+    <p>生年月日：${birth}</p>
+    <h4>性格</h4><p>${t}</p>
+    <h4>過去</h4><p>${s}</p>
+  </div>`;
+};
 
-    console.log("全 JSON 読み込み完了");
+/* ===============================
+   相性診断（完全版）
+================================ */
+function getCompatibility(a,b){
+  if(!ATTR[a]||!ATTR[b]) return "属性データ不足";
 
-  }catch(e){
-    console.error("ロード中断", e);
-  }
+  const attrA=ATTR[a].attribute;
+  const attrB=ATTR[b].attribute;
+
+  const pair=COMPAT.attribute_pair?.[attrA]?.[attrB];
+  if(!pair) return "相性未定義";
+
+  return `相性レベル${pair.level}：${pair.comment}`;
 }
 
-loadAll();
+document.getElementById("btn_pair").onclick=()=>{
+  const a=Number(pair_a.value);
+  const b=Number(pair_b.value);
+  if(!a||!b){alert("入力不足");return;}
 
-// -----------------------------------------------------
-// ■ 個別診断
-// -----------------------------------------------------
-function analyzeSingle(){
-  if(!loaded){ alert("データ読み込み中です"); return; }
-
-  const name   = document.getElementById("single_name").value || "未入力";
-  const birth  = document.getElementById("single_birth").value || "未入力";
-  const meisuu = Number(document.getElementById("single_meisuu").value);
-
-  if(!meisuu || meisuu<1 || meisuu>60){
-    alert("命数は1〜60で入力してください");
-    return;
-  }
-
-  // データが存在しない場合の安全策
-  const t = TRAITS[meisuu] || { core:"データなし" };
-  const s = STORY[meisuu]  || { past:"データなし" };
-  const m = META[meisuu]   || { zodiac:"不明", type:"不明" };
-
-  document.getElementById("single_result").innerHTML = `
-    <div class="card">
-      <h3>${name} さん</h3>
-      <p><b>命数：</b>${meisuu}</p>
-      <p><b>守護星座：</b>${m.zodiac}（${m.type}）</p>
-      <p><b>生年月日：</b>${birth}</p>
-
-      <h4>■ 性格・核</h4>
-      <p>${t.core}</p>
-
-      <h4>■ 過去ストーリー</h4>
-      <p>${s.past}</p>
-    </div>
-  `;
-}
-
-
-// -----------------------------------------------------
-// ■ 相性診断
-// -----------------------------------------------------
-function analyzePair(){
-  if(!loaded){ alert("データ読み込み中です"); return; }
-
-  const a = Number(document.getElementById("pair_a").value);
-  const b = Number(document.getElementById("pair_b").value);
-
-  if(!a || !b){
-    alert("命数を入力してください");
-    return;
-  }
-
-  const key = `${a}-${b}`;
-  const val = COMPAT[key] || "相性データなし";
-
-  document.getElementById("pair_result").innerHTML = `
-    <div class="card">
-      <h3>命数 ${a} × ${b}</h3>
-      <p>${val}</p>
-    </div>
-  `;
-}
-
-
-// -----------------------------------------------------
-// ■ グループ追加
-// -----------------------------------------------------
-function addMember(){
-  const area = document.getElementById("group_area");
-  const div = document.createElement("div");
-  div.className = "member-block";
-  div.innerHTML = `
-    <label>名前</label>
-    <input class="g_name">
-
-    <label>生年月日（記録用）</label>
-    <input class="g_birth" type="date">
-
-    <label>命数（1〜60）</label>
-    <input class="g_meisuu" type="number" min="1" max="60">
-  `;
-  area.appendChild(div);
-}
-
-// -----------------------------------------------------
-// ■ グループ診断
-// -----------------------------------------------------
-function analyzeGroup(){
-  if(!loaded){ alert("データ読み込み中です"); return; }
-
-  const blocks = document.querySelectorAll(".member-block");
-  if(blocks.length===0){
-    alert("人数を追加してください");
-    return;
-  }
-
-  let members = [];
-
-  blocks.forEach(b=>{
-    const name = b.querySelector(".g_name").value || "未入力";
-    const birth = b.querySelector(".g_birth").value || "";
-    const m = Number(b.querySelector(".g_meisuu").value);
-
-    if(!m) return;
-
-    members.push({
-      name,
-      birth,
-      meisuu:m,
-      trait:TRAITS[m] || {core:"データなし"},
-      story:STORY[m] || {past:"データなし"},
-      meta:META[m] || {zodiac:"不明", type:"不明"}
-    });
-  });
-
-  if(members.length===0){
-    alert("命数が入力されていません");
-    return;
-  }
-
-  // 個別表示
-  let html = `<div class="card"><h3>■ 個別診断結果一覧</h3>`;
-  members.forEach(p=>{
-    html += `
-      <div class="member-block">
-        <b>${p.name}</b><br>
-        命数：${p.meisuu}<br>
-        守護星座：${p.meta.zodiac}（${p.meta.type}）<br>
-        <b>性格：</b>${p.trait.core}<br>
-        <b>過去：</b>${p.story.past}
-      </div>
-    `;
-  });
-  html += `</div>`;
-
-  // グループ相性
-  html += `<div class="card"><h3>■ グループ相性</h3>`;
-  for(let i=0;i<members.length;i++){
-    for(let j=i+1;j<members.length;j++){
-      const a = members[i].meisuu;
-      const b = members[j].meisuu;
-      const key = `${a}-${b}`;
-      const val = COMPAT[key] || "相性データなし";
-
-      html += `
-        <div class="member-block">
-          <b>${members[i].name} × ${members[j].name}</b><br>
-          命数 ${a} × ${b}<br>
-          <p>${val}</p>
-        </div>
-      `;
-    }
-  }
-  html += `</div>`;
-
-  document.getElementById("group_result").innerHTML = html;
-}
-
+  document.getElementById("pair_result").innerHTML=`
+  <div class="card">
+    <h3>命数 ${a} × ${b}</h3>
+    <p>${getCompatibility(a,b)}</p>
+  </div>`;
+};
 </script>
 
 </body>
