@@ -13,60 +13,86 @@ header{padding:16px;border-bottom:1px solid #ddd;background:#fff}
 h3{margin-top:0}
 button{padding:10px 16px;border-radius:20px;border:1px solid #555;cursor:pointer;background:#fff}
 button.run{background:#222;color:#fff;border:none}
-button[disabled]{opacity:0.5;cursor:not-allowed}
-input{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
+button[disabled]{opacity:0.5;cursor:not-allowed;}
+input,select{padding:8px;border:1px solid #ccc;border-radius:8px;width:100%}
 .flex{display:flex;gap:20px}
 .member-block{border:1px dashed #aaa;padding:16px;border-radius:12px;margin-bottom:16px;background:#fefefe}
 </style>
 </head>
 
 <body>
+
 <header>
 <h2>🔮 運命の六属性診断（内部ツール）</h2>
-<small>完全統合版 / GitHub Pages 対応</small>
+<small>完全版 / GitHub Pages 対応</small>
 </header>
 
 <div class="container">
 
+<!-- 個別診断 -->
 <div class="card">
 <h3>■ 個別診断</h3>
+
 <div class="flex">
-<div>
+<div style="flex:1">
 <label>名前</label>
 <input id="single_name">
 </div>
-<div>
-<label>生年月日</label>
-<input type="date" id="single_birth">
+
+<div style="flex:1">
+<label>生年月日（記録用）</label>
+<input id="single_birth" type="date">
 </div>
-<div>
+
+<div style="flex:1">
 <label>命数（1〜60）</label>
-<input type="number" id="single_meisuu" min="1" max="60">
+<input id="single_meisuu" type="number" min="1" max="60">
 </div>
 </div>
+
 <br>
 <button class="run" id="btn_single" disabled>読み込み中…</button>
 </div>
+
 <div id="single_result"></div>
 
+
+<!-- 相性診断 -->
 <div class="card">
-<h3>■ 相性診断</h3>
+<h3>■ 相性診断（2人）</h3>
+
 <div class="flex">
-<div>
-<label>本人命数</label>
-<input type="number" id="pair_a" min="1" max="60">
+<div style="flex:1">
+<label>本人の命数</label>
+<input id="pair_a" type="number" min="1" max="60">
 </div>
-<div>
-<label>相手命数</label>
-<input type="number" id="pair_b" min="1" max="60">
+
+<div style="flex:1">
+<label>相手の命数</label>
+<input id="pair_b" type="number" min="1" max="60">
 </div>
 </div>
+
 <br>
 <button class="run" id="btn_pair" disabled>読み込み中…</button>
 </div>
+
 <div id="pair_result"></div>
 
+
+<!-- グループ診断 -->
+<div class="card">
+<h3>■ グループ診断（複数名）</h3>
+<div id="group_area"></div>
+
+<button id="btn_add" disabled>＋ 人を追加</button>
+<button class="run" id="btn_group" disabled>読み込み中…</button>
 </div>
+
+<div id="group_result"></div>
+
+</div> <!-- container -->
+
 
 <script>
 /* ===============================
@@ -89,13 +115,40 @@ async function safeLoad(url, fallback={}){
 }
 
 /* ===============================
+   データ正規化（1〜60保証）
+================================ */
+function normalize60(obj, def){
+  const out={};
+  for(let i=1;i<=60;i++){
+    out[i] = obj?.[i] ?? def;
+  }
+  return out;
+}
+
+/* ===============================
    全ロード
 ================================ */
 async function init(){
-  TRAITS = await safeLoad("data/traits.json");
-  STORY  = await safeLoad("data/story.json");
-  META   = await safeLoad("data/meta.json");
-  ATTR   = await safeLoad("data/attributes.json");
+  TRAITS = normalize60(
+    await safeLoad("data/traits.json"),
+    { core:"未定義" }
+  );
+
+  STORY = normalize60(
+    await safeLoad("data/story.json"),
+    { past:"未定義" }
+  );
+
+  META = normalize60(
+    await safeLoad("data/meta.json"),
+    { zodiac:"不明", type:"" }
+  );
+
+  ATTR = normalize60(
+    await safeLoad("data/attributes.json"),
+    { attribute:"不明" }
+  );
+
   COMPAT = await safeLoad("data/compatibility.json");
 
   document.getElementById("btn_single").disabled=false;
@@ -104,7 +157,7 @@ async function init(){
   document.getElementById("btn_pair").disabled=false;
   document.getElementById("btn_pair").textContent="相性を見る";
 
-  console.log("初期化完了");
+  console.log("初期化完了（1〜60正規化済）");
 }
 init();
 
@@ -115,11 +168,15 @@ document.getElementById("btn_single").onclick=()=>{
   const name=document.getElementById("single_name").value||"未入力";
   const birth=document.getElementById("single_birth").value||"";
   const m=Number(document.getElementById("single_meisuu").value);
-  if(!m||m<1||m>60){alert("命数エラー");return;}
 
-  const t=TRAITS[m]?.core||"未定義";
-  const s=STORY[m]?.past||"未定義";
-  const meta=META[m]||{zodiac:"不明",type:""};
+  if(!Number.isInteger(m)||m<1||m>60){
+    alert("命数は1〜60で入力してください");
+    return;
+  }
+
+  const t = TRAITS[m].core;
+  const s = STORY[m].past;
+  const meta = META[m];
 
   document.getElementById("single_result").innerHTML=`
   <div class="card">
@@ -133,16 +190,25 @@ document.getElementById("btn_single").onclick=()=>{
 };
 
 /* ===============================
-   相性診断（完全版）
+   相性診断（完全防御）
 ================================ */
 function getCompatibility(a,b){
-  if(!ATTR[a]||!ATTR[b]) return "属性データ不足";
+  if(a<1||a>60||b<1||b>60) return "命数範囲エラー";
 
-  const attrA=ATTR[a].attribute;
-  const attrB=ATTR[b].attribute;
+  const attrA = ATTR[a].attribute;
+  const attrB = ATTR[b].attribute;
 
-  const pair=COMPAT.attribute_pair?.[attrA]?.[attrB];
-  if(!pair) return "相性未定義";
+  if(attrA==="不明"||attrB==="不明"){
+    return "属性データ不足";
+  }
+
+  const pair =
+    COMPAT?.attribute_pair?.[attrA]?.[attrB] ??
+    COMPAT?.attribute_pair?.[attrB]?.[attrA];
+
+  if(!pair){
+    return "相性未定義";
+  }
 
   return `相性レベル${pair.level}：${pair.comment}`;
 }
@@ -150,7 +216,11 @@ function getCompatibility(a,b){
 document.getElementById("btn_pair").onclick=()=>{
   const a=Number(pair_a.value);
   const b=Number(pair_b.value);
-  if(!a||!b){alert("入力不足");return;}
+
+  if(!Number.isInteger(a)||!Number.isInteger(b)){
+    alert("命数を正しく入力してください");
+    return;
+  }
 
   document.getElementById("pair_result").innerHTML=`
   <div class="card">
